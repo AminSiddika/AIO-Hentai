@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
-"""Discover genre/category browse paths for each source from its own home page.
+"""Discover genre/category browse paths for each source from its own navigation.
 
-Writes a Kotlin data file consumed by compat.Genres. Only paths that look like
-listing sections are kept; the result is verified later by scripts/genre_smoke.
+Preference order per site:
+  1. genre/category links on the home page
+  2. genre/category links on a dedicated index page (/genre/, /genres/, ...)
+  3. tag links on the home page (last resort, fewer rows)
+
+The result is verified by `provider_smoke.sh --genres`; rows that return no items are
+pruned afterwards.
 """
-import json
 import os
 import re
 import subprocess
@@ -12,31 +16,30 @@ import sys
 from concurrent.futures import ThreadPoolExecutor
 
 ROOT = "/data/data/com.termux/files/home/AIO-Hentai"
-SITES = os.path.join(ROOT, "AIO-Hentai/src/main/kotlin/com/aiohentai/cs/sites")
 OUT = os.path.join(ROOT, "AIO-Hentai/src/main/kotlin/com/aiohentai/cs/compat/Genres.kt")
 AUDIT = "/data/data/com.termux/files/usr/tmp/opencode/genre_audit.txt"
 MAX_GENRES = 8
+MAX_TAGS = 6
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/124.0 Safari/537.36")
 
+INDEX_PATHS = ["/genre/", "/genres/", "/hentai-genre/", "/category/", "/tags/"]
+
 BAD = re.compile(
-    r"(/page/\d|^/tag/|/tag/|/genre/?$|/category/?$|/genres/?$|uncategorized|"
+    r"(/page/\d|/tag/|/genre/?$|/category/?$|/genres/?$|uncategorized|"
     r"\?|#|javascript|/profile/|/user/|/login|/register|/dmca|/contact|/privacy)",
+    re.IGNORECASE,
+)
+BAD_TAG = re.compile(
+    r"(/page/\d|/tag/?$|/genre/?$|/category/?$|/genres/?$|uncategorized|"
+    r"\?|#|javascript|/profile/|/user/|/login|/register)",
     re.IGNORECASE,
 )
 
 GENERIC_TEXT = {
     "view more", "see more", "more", "view all", "all", "show more",
-    "browse", "browse all", "genre", "genres", "category", "categories",
+    "browse", "browse all", "genre", "genres", "category", "categories", "tags",
 }
-
-
-def slug_title(href: str) -> str:
-    slug = href.rstrip("/").rsplit("/", 1)[-1]
-    slug = re.sub(r"[-_]+", " ", slug).strip()
-    if not slug:
-        return "More"
-    return " ".join(w.capitalize() if w.isalpha() else w for w in slug.split())
 
 
 def fetch(url: str) -> str:
@@ -50,35 +53,63 @@ def fetch(url: str) -> str:
         return ""
 
 
-def genres_for(site: str, base: str):
-    html = fetch(base if base.endswith("/") else base + "/")
-    if not html:
-        return site, []
+def slug_title(href: str) -> str:
+    slug = href.rstrip("/").rsplit("/", 1)[-1]
+    slug = re.sub(r"[-_]+", " ", slug).strip()
+    if not slug:
+        return "More"
+    return " ".join(w.capitalize() if w.isalpha() else w for w in slug.split())
+
+
+def collect(html: str, pattern: str, bad, limit: int):
     seen = {}
-    # anchor text + href
+    names = set()
     for m in re.finditer(r'<a[^>]+href="([^"]+)"[^>]*>(.*?)</a>', html, re.S | re.I):
-        href, inner = m.group(1), m.group(2)
-        text = re.sub(r"<[^>]+>", " ", inner)
-        text = re.sub(r"\s+", " ", text).strip()
-        if not text or len(text) > 30:
-            continue
+        href = m.group(1)
+        text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", m.group(2))).strip()
         if hud := re.match(r"^(https?:)?//[^/]+(/.*)$", href):
             href = hud.group(2)
-        if not href.startswith("/"):
+        if not href.startswith("/") or not re.search(pattern, href, re.I):
             continue
-        if not re.search(r"/(genre|category|genres)/", href, re.I):
+        if bad.search(href):
             continue
-        if BAD.search(href) or BAD.search(text):
+        if len(text) > 30:
             continue
         if not text or text.lower() in GENERIC_TEXT:
             text = slug_title(href)
+        if bad.search(text):
+            continue
         key = href.rstrip("/")
-        if key in seen or text.lower() in {v.lower() for v in seen.values()}:
+        if key in seen or text.lower() in names:
             continue
         seen[key] = text
-        if len(seen) >= MAX_GENRES:
+        names.add(text.lower())
+        if len(seen) >= limit:
             break
-    return site, list(seen.items())
+    return list(seen.items())
+
+
+def genres_for(site: str, base: str):
+    base = base if base.endswith("/") else base + "/"
+    home = fetch(base)
+    if home:
+        items = collect(home, r"/(genre|category|genres)/", BAD, MAX_GENRES)
+        if items:
+            return site, items
+
+    for path in INDEX_PATHS:
+        page = fetch(base.rstrip("/") + path)
+        if not page:
+            continue
+        items = collect(page, r"/(genre|category|genres)/", BAD, MAX_GENRES)
+        if items:
+            return site, items
+
+    if home:
+        items = collect(home, r"/tag/", BAD_TAG, MAX_TAGS)
+        if items:
+            return site, items
+    return site, []
 
 
 def main():
@@ -88,7 +119,7 @@ def main():
         targets.append((site, url))
 
     result = {}
-    with ThreadPoolExecutor(max_workers=10) as pool:
+    with ThreadPoolExecutor(max_workers=12) as pool:
         for site, items in pool.map(lambda t: genres_for(*t), targets):
             if items:
                 result[site] = items
@@ -112,7 +143,7 @@ def main():
     with open(OUT, "w", encoding="utf-8") as fh:
         fh.write("\n".join(lines))
 
-    print(f"{len(result)} sites with genres -> {OUT}")
+    print(f"{len(result)} sites with browse rows -> {OUT}")
     for site in sorted(result):
         print(f"  {site}: {len(result[site])}")
 
