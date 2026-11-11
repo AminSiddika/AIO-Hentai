@@ -60,6 +60,8 @@ jobs:
           mkdir -p "$BUILDS/AIO-Hentai"
           find . -name '*.cs3' -exec cp -f {} "$BUILDS/" \;
           cp build/plugins.json "$BUILDS/plugins.json"
+          cp repo.json "$BUILDS/repo.json"
+          cp repo-jsdelivr.json "$BUILDS/repo-jsdelivr.json"
           cp AIO-Hentai/icon.png "$BUILDS/AIO-Hentai/icon.png"
           ls -lh "$BUILDS"
 

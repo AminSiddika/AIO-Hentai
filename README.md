@@ -8,18 +8,23 @@ All sources are adult (NSFW) English video sites.
 
 ## Install
 
-1. CloudStream → **Settings → Extensions → Add repository**.
-2. Paste the repository URL:
+CloudStream → **Settings → Extensions → Add repository**. Use one of:
 
 ```
-https://raw.githubusercontent.com/AminSiddika/AIO-Hentai/builds/plugins.json
+https://raw.githubusercontent.com/AminSiddika/AIO-Hentai/main/repo.json
+https://cdn.jsdelivr.net/gh/AminSiddika/AIO-Hentai@main/repo.json
 ```
 
-3. Install **AIO-Hentai** from the repository, then pick any of the sources in
-   **Home → Anime/Movie**.
+Both point at the same repository (`repo.json` is the manifest; `pluginLists` in it points
+to `plugins.json` on the `builds` branch). If GitHub raw is slow or blocked on your
+network, use the jsDelivr one, or enable **Use jsDelivr proxy** in CloudStream settings so
+it rewrites `raw.githubusercontent.com` links itself.
 
-`repo.json` at the repository root is the same repository in the short-code format
-(`Add repository` → paste `repo.json` URL).
+Opening the URL in a phone browser must show JSON. If it shows `404: Not Found`, the URL
+is wrong — that is the only way CloudStream produces the "Invalid URL" / JSON parse error.
+
+Then install **AIO-Hentai** from the repository and pick a source under
+**Home → Anime / Movie**.
 
 ## How it is built
 
