@@ -30,11 +30,13 @@ class P91 : AnimeHttpSource() {
         MediaVideo.referer = "$baseUrl/"
     }
 
-    override fun popularAnimeRequest(page: Int): Request = GET(pageUrl(page), headers)
+    override fun popularAnimeRequest(page: Int): Request =
+        GET(withPage("$baseUrl/v.php?category=hot&viewtype=basic", page), headers)
 
     override fun popularAnimeParse(response: Response): AnimesPage = parseList(response)
 
-    override fun latestUpdatesRequest(page: Int): Request = GET(pageUrl(page), headers)
+    override fun latestUpdatesRequest(page: Int): Request =
+        GET(withPage("$baseUrl/v.php?next=watch", page), headers)
 
     override fun latestUpdatesParse(response: Response): AnimesPage = parseList(response)
 
@@ -46,8 +48,8 @@ class P91 : AnimeHttpSource() {
 
     override fun searchAnimeParse(response: Response): AnimesPage = parseList(response)
 
-    private fun pageUrl(page: Int): String =
-        if (page <= 1) "$baseUrl/index.php" else "$baseUrl/index.php?page=$page"
+    private fun withPage(base: String, page: Int): String =
+        if (page <= 1) base else "$base&page=$page"
 
     private fun parseList(response: Response): AnimesPage {
         val doc = response.asJsoup()

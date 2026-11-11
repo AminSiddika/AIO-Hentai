@@ -1,6 +1,6 @@
 # Sources
 
-**73 providers** in plugin **v8**. Most are ported from the Aniyomi suite
+**73 providers** in plugin **v9**. Most are ported from the Aniyomi suite
 [`AminSiddika/animetail-extensions`](https://github.com/AminSiddika/animetail-extensions);
 MissAV, SupJav and SexTB were written for this plugin.
 Browse names keep the upstream `@JalebiBae - ` prefix, omitted here for readability.
@@ -8,7 +8,7 @@ Every active source implements a latest section and is overridable in CloudStrea
 
 - Package root: `com.aiohentai.cs.sites.<package>`
 - Each entry has `<Source>.kt` (scraper) and `<Source>Provider.kt` (`AniyomiProvider(<Source>())`).
-- "Browse rows" is the number of verified genre/category rows in `compat/Genres.kt` (37 sites, 184 rows; `—` = none).
+- "Browse rows" is the number of verified genre/category rows in `compat/Genres.kt` (38 sites, 192 rows; `—` = none).
 
 | Browse name | Class | Package | Base URL | Browse rows |
 |---|---|---|---|---|
@@ -88,11 +88,12 @@ Every active source implements a latest section and is overridable in CloudStrea
 
 ## Sources with genre rows
 
-These **37** sources expose static home-screen browse rows. Rows that returned zero items were pruned; the counts below were verified with `provider_smoke.sh --genres`.
+These **38** sources expose static home-screen browse rows. Rows that returned zero items were pruned; the counts below were verified with `provider_smoke.sh --genres`.
 
 | Package | Rows |
 |---|---|
 | `animeidhentai` | 8 |
+| `avporner` | 8 |
 | `animesex` | 1 |
 | `erotichentai` | 1 |
 | `hanimered` | 6 |
@@ -130,7 +131,7 @@ These **37** sources expose static home-screen browse rows. Rows that returned z
 | `xanimeporn` | 1 |
 | `zhentube` | 1 |
 
-Distribution: **93** `/genre/`, **35** `/category/`, **24** `/tag/`, **10** `/genres/`, **8** `/en/genres/` (MissAV), **6** `/rule34/`, **5** `/hentai/`, **3** `/jav-*` (SexTB) — **184 total**.
+Distribution: **93** `/genre/`, **35** `/category/`, **24** `/tag/`, **10** `/genres/`, **8** `/en/genres/` (MissAV), **8** `/videos/category/` (AVPorner), **6** `/rule34/`, **5** `/hentai/`, **3** `/jav-*` (SexTB) — **192 total**.
 
 ## Removed in v3
 
@@ -152,7 +153,9 @@ Cloudflare managed challenge: the provider uses CloudStream's `CloudflareKiller`
 MissAV, SupJav, SexTB, JavGG, AsianViral, JavTsunami, Manko and AVPorner are
 Cloudflare-fronted and use `CloudflareKiller` in-app.
 JavGG was verified live: home 40, search 6, load + 1 HLS, and five tag rows returning 40 each.
-v8 adds 91Porn, AsianViral, JavTsunami, Manko and AVPorner. Manko's encrypted API was
+v8/v9 add 91Porn, AsianViral, JavTsunami, Manko and AVPorner.
+91Porn now lists `v.php?next=watch` (not the 24-item home), and AVPorner has Popular
+(`/videos/trending`) plus 8 category rows. Manko's encrypted API was
 reversed (base-91 decoder -> JSON -> `wasabi_url_1`/`missav_video` HLS). AvJiali and
 herexxx were skipped as paywalled; Ikisoda was skipped because its public file URLs 404.
 SupJav's player chain was verified end to end from a saved detail page (HLS master

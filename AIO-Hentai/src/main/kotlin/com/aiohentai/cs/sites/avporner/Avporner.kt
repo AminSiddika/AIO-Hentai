@@ -32,7 +32,7 @@ class Avporner : AnimeHttpSource() {
     }
 
     override fun popularAnimeRequest(page: Int): Request =
-        GET(withPage("$baseUrl/videos/category/Japanese", page), headers)
+        GET(withPage("$baseUrl/videos/trending", page), headers)
 
     override fun popularAnimeParse(response: Response): AnimesPage = parseList(response)
 
@@ -49,14 +49,23 @@ class Avporner : AnimeHttpSource() {
 
     override fun searchAnimeParse(response: Response): AnimesPage = parseList(response)
 
+    override fun genrePageUrl(path: String, page: Int): String {
+        val base = when {
+            path.startsWith("http://") || path.startsWith("https://") -> path
+            path.startsWith("/") -> baseUrl.trimEnd('/') + path
+            else -> baseUrl.trimEnd('/') + "/" + path
+        }
+        return withPage(base, page)
+    }
+
     private fun withPage(base: String, page: Int): String {
         if (page <= 1) return base
-        return if (base.contains('?')) "$base&page=$page" else "$base?page=$page"
+        return if (base.contains('?')) "$base&page_id=$page" else "$base?page_id=$page"
     }
 
     private fun parseList(response: Response): AnimesPage {
         val doc = response.asJsoup()
-        val items = doc.select(".video-list")
+        val items = doc.select("div.video-list, div.video-thumb")
             .mapNotNull { card ->
                 val link = card.selectFirst("a[href*='/watch/']") ?: return@mapNotNull null
                 val href = link.absUrl("href").ifBlank { link.attr("href") }
@@ -66,6 +75,8 @@ class Avporner : AnimeHttpSource() {
                     setUrlWithoutDomain(href)
                     title = card.selectFirst(".video-list-title h4")?.text()?.trim()
                         ?.takeIf { it.isNotBlank() }
+                        ?: card.selectFirst(".video-title, h4, h3")?.text()?.trim()
+                            ?.takeIf { it.isNotBlank() }
                         ?: image?.attr("alt")?.trim().orEmpty()
                     thumbnail_url = image?.absUrl("data-src")?.takeIf { it.isNotBlank() }
                         ?: image?.absUrl("src")
@@ -73,7 +84,9 @@ class Avporner : AnimeHttpSource() {
             }
             .distinctBy { it.url }
 
-        val hasNext = doc.select("a[href]").any { it.text().trim() == "»" || it.text().contains("Next", true) }
+        val hasNext = doc.select("a[href*='page_id='], a[href]").any {
+            it.attr("href").contains("page_id=") || it.text().trim() == "»" || it.text().contains("Next", true)
+        }
         return AnimesPage(items, hasNext)
     }
 

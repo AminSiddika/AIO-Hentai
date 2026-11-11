@@ -8,6 +8,7 @@ package com.aiohentai.cs.compat
 object Genres {
 
     val bySite: Map<String, List<Pair<String, String>>> = mapOf(
+        "avporner" to listOf("Uncensored" to "/videos/category/Uncensored", "Japanese" to "/videos/category/Japanese", "Chinese" to "/videos/category/Chinese", "Korean" to "/videos/category/Korean", "Creampie" to "/videos/category/Creampie", "MILF" to "/videos/category/MILF", "Big Tits" to "/videos/category/Big%20Tits", "Threesome" to "/videos/category/Threesome"),
         "animeidhentai" to listOf("Ahegao" to "/genre/ahegao", "Anal" to "/genre/anal", "Big Breasts" to "/genre/big-breasts", "Blowjob" to "/genre/blowjob", "Censored" to "/genre/censored", "Uncensored" to "/genre/hentai-uncensored", "Creampie" to "/genre/creampie", "Subbed" to "/genre/subbed"),
         "animesex" to listOf("Uncensored Hentai" to "/genres/uncensored"),
         "erotichentai" to listOf("Big Tit Step Mom" to "/category/big-tit-step-mom"),
