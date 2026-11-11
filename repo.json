@@ -1,0 +1,8 @@
+{
+  "name": "Animetail Extensions",
+  "description": "NSFW video sources ported from the Aniyomi Animetail extension suite.",
+  "manifestVersion": 1,
+  "pluginLists": [
+    "https://raw.githubusercontent.com/AminSiddika/animetail-cloudstream/builds/plugins.json"
+  ]
+}

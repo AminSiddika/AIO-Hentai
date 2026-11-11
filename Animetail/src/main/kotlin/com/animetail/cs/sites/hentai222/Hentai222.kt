@@ -1,0 +1,137 @@
+package com.animetail.cs.sites.hentai222
+
+import com.animetail.cs.compat.MediaVideo
+
+import com.animetail.cs.compat.AnimeFilterList
+import com.animetail.cs.compat.AnimesPage
+import com.animetail.cs.compat.SAnime
+import com.animetail.cs.compat.SEpisode
+import com.animetail.cs.compat.Video
+import com.animetail.cs.compat.AnimeHttpSource
+import com.animetail.cs.compat.GET
+import com.animetail.cs.compat.asJsoup
+import okhttp3.Request
+import okhttp3.Response
+import java.net.URLEncoder
+
+class Hentai222 : AnimeHttpSource() {
+
+    override val name = "@JalebiBae - Hentai222"
+    override val id: Long = 5713325484251259760L
+    override val baseUrl = "https://hentai222.com"
+    init {
+        MediaVideo.referer = "$baseUrl/"
+    }
+    override val lang = "en"
+    override val supportsLatest = true
+
+    override fun popularAnimeRequest(page: Int): Request = GET(listUrl(page), headers)
+
+    override fun popularAnimeParse(response: Response): AnimesPage = parseList(response)
+
+    override fun latestUpdatesRequest(page: Int): Request = GET(listUrl(page), headers)
+
+    override fun latestUpdatesParse(response: Response): AnimesPage = parseList(response)
+
+    override fun searchAnimeRequest(page: Int, query: String, filters: AnimeFilterList): Request {
+        val encoded = URLEncoder.encode(query, "UTF-8")
+        return GET("$baseUrl/?q=$encoded", headers)
+    }
+
+    override fun searchAnimeParse(response: Response): AnimesPage = parseList(response)
+
+    private fun listUrl(page: Int): String =
+        if (page <= 1) "$baseUrl/videos" else "$baseUrl/videos?page=$page"
+
+    private fun parseList(response: Response): AnimesPage {
+        val doc = response.asJsoup()
+        val items = doc.select("a[href^='https://hentai222.com/video/']")
+            .mapNotNull { link ->
+                val href = link.absUrl("href").ifBlank { link.attr("href") }
+                if (!VIDEO_URL.matches(href)) return@mapNotNull null
+                val img = link.selectFirst("img")
+                val title = img?.attr("alt")?.trim()?.takeIf { it.isNotBlank() }
+                    ?: link.attr("title").trim().takeIf { it.isNotBlank() }
+                    ?: link.selectFirst("h3")?.text()?.trim()
+                    ?: link.text().trim()
+                SAnime.create().apply {
+                    setUrlWithoutDomain(href)
+                    this.title = title
+                    thumbnail_url = img?.attr("data-src")?.takeIf { it.isNotBlank() }
+                        ?: img?.absUrl("src")
+                        ?: link.attr("data-bg")?.takeIf { it.isNotBlank() }
+                }
+            }
+            .distinctBy { it.url }
+
+        val current = Regex("[?&]page=(\\d+)").find(response.request.url.toString())
+            ?.groupValues?.get(1)?.toIntOrNull() ?: 1
+        val hasNext = doc.select("a[href]").any {
+            it.attr("href").contains("page=${current + 1}")
+        } || items.size >= 20
+        return AnimesPage(items, hasNext)
+    }
+
+    override fun animeDetailsParse(response: Response): SAnime {
+        val doc = response.asJsoup()
+        return SAnime.create().apply {
+            title = doc.selectFirst("h1")?.text()?.trim().orEmpty()
+            thumbnail_url = doc.selectFirst("meta[property=og:image]")?.attr("content")
+            genre = doc.select("a[href*='/hashtag/'], a[href*='/tag/'], a[href*='/category/']")
+                .map { it.text().trim() }
+                .distinct()
+                .joinToString(", ")
+            description = doc.selectFirst("meta[name=description]")?.attr("content")
+            status = SAnime.COMPLETED
+            initialized = true
+        }
+    }
+
+    override fun episodeListParse(response: Response): List<SEpisode> = listOf(
+        SEpisode.create().apply {
+            setUrlWithoutDomain(response.request.url.toString())
+            name = "Full Video"
+            episode_number = 1f
+        },
+    )
+
+    override fun videoListParse(response: Response): List<Video> {
+        val doc = response.asJsoup()
+        val urls = mutableListOf<String>()
+        doc.select("video source[src]").forEach { source ->
+            val url = source.absUrl("src").ifBlank { source.attr("src") }
+                .replace("&amp;", "&")
+            if (url.startsWith("http")) urls.add(url)
+        }
+        if (urls.isEmpty()) {
+            Regex("\"contentUrl\":\"([^\"]+\\.mp4)\"")
+                .find(doc.html())
+                ?.groupValues?.get(1)
+                ?.replace("\\/", "/")
+                ?.takeIf { it.startsWith("http") }
+                ?.let(urls::add)
+        }
+        val videoHeaders = headers.newBuilder()
+            .set("Referer", "$baseUrl/")
+            .build()
+        return urls.distinct().map { url ->
+            proxyVideo(url, "MP4")
+        }
+    }
+
+    private fun proxyVideo(url: String, label: String): Video {
+        val videoHeaders = headers.newBuilder()
+            .set("Referer", "$baseUrl/")
+            .set(
+                "User-Agent",
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+                    "(KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+            )
+            .build()
+        return MediaVideo.create(url, label, url, videoHeaders)
+    }
+
+    companion object {
+        private val VIDEO_URL = Regex("""^https://hentai222\.com/video/[^/?#]+/[^/?#]+/?$""")
+    }
+}
