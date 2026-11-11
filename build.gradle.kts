@@ -70,6 +70,7 @@ subprojects {
 
     dependencies {
         val implementation by configurations
+        val compileOnly by configurations
         val cloudstream by configurations
 
         // CloudStream API stubs (classes.jar from the pre-release build)
