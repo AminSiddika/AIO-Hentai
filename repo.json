@@ -1,6 +1,6 @@
 {
   "name": "AIO-Hentai",
-  "description": "NSFW video sources ported from the Aniyomi Animetail extension suite.",
+  "description": "NSFW anime/hentai and JAV video sources for CloudStream.",
   "manifestVersion": 1,
   "pluginLists": [
     "https://raw.githubusercontent.com/AminSiddika/AIO-Hentai/builds/plugins.json"

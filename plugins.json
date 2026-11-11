@@ -2,24 +2,25 @@
     {
         "url": "https://raw.githubusercontent.com/AminSiddika/AIO-Hentai/builds/AIO-Hentai.cs3",
         "status": 2,
-        "version": 3,
+        "version": 6,
         "name": "AIO-Hentai",
         "internalName": "AIO-Hentai",
         "authors": [
             "JalebiBae"
         ],
-        "description": "64 adult anime/hentai video sources ported from the Aniyomi Animetail extension suite",
-        "fileSize": 249721,
+        "description": "68 adult anime/hentai and JAV video sources for CloudStream",
+        "fileSize": 270870,
         "repositoryUrl": "https://github.com/AminSiddika/AIO-Hentai",
         "language": "en",
         "tvTypes": [
             "Movie",
             "Anime",
             "TvSeries",
-            "AsianDrama"
+            "AsianDrama",
+            "NSFW"
         ],
         "iconUrl": "https://raw.githubusercontent.com/AminSiddika/AIO-Hentai/builds/AIO-Hentai/icon.png",
         "apiVersion": 1,
-        "fileHash": "sha256-b687eb4473ca82d39c0a8d2eacf3c8b14bd4d5be28bbfa83d2692e0d65b2d583"
+        "fileHash": "sha256-abe83dbdbeaf6c8423b8fc6228927c880563d14b61f076f057dab41c5836f2b3"
     }
 ]
