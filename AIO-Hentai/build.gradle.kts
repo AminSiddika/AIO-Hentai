@@ -1,10 +1,10 @@
-version = 3
+version = 6
 
 cloudstream {
     language = "en"
-    description = "64 adult anime/hentai video sources ported from the Aniyomi Animetail extension suite"
+    description = "68 adult anime/hentai and JAV video sources for CloudStream"
     authors = listOf("JalebiBae")
     status = 2
-    tvTypes = listOf("Movie", "Anime", "TvSeries", "AsianDrama")
+    tvTypes = listOf("Movie", "Anime", "TvSeries", "AsianDrama", "NSFW")
     iconUrl = "https://raw.githubusercontent.com/AminSiddika/AIO-Hentai/builds/AIO-Hentai/icon.png"
 }

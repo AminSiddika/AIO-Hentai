@@ -1,13 +1,14 @@
 # Sources
 
-**64 providers** in plugin **v3**. All are ported from the Aniyomi suite
-[`AminSiddika/animetail-extensions`](https://github.com/AminSiddika/animetail-extensions).
+**68 providers** in plugin **v6**. Most are ported from the Aniyomi suite
+[`AminSiddika/animetail-extensions`](https://github.com/AminSiddika/animetail-extensions);
+MissAV, SupJav and SexTB were written for this plugin.
 Browse names keep the upstream `@JalebiBae - ` prefix, omitted here for readability.
 Every active source implements a latest section and is overridable in CloudStream settings.
 
 - Package root: `com.aiohentai.cs.sites.<package>`
 - Each entry has `<Source>.kt` (scraper) and `<Source>Provider.kt` (`AniyomiProvider(<Source>())`).
-- "Browse rows" is the number of verified genre/category rows in `compat/Genres.kt` (33 sites, 162 rows; `—` = none).
+- "Browse rows" is the number of verified genre/category rows in `compat/Genres.kt` (37 sites, 184 rows; `—` = none).
 
 | Browse name | Class | Package | Base URL | Browse rows |
 |---|---|---|---|---|
@@ -55,7 +56,9 @@ Every active source implements a latest section and is overridable in CloudStrea
 | Hentaverse | `Hentaverse` | `hentaverse` | https://hentaverse.com | — |
 | HStream | `HStream` | `hstream` | https://hstream.moe | — |
 | Jav.Guru | `JavGuru` | `javguru` | https://jav.guru | 7 |
+| JavGG | `Javgg` | `javgg` | https://javgg.net | 5 |
 | MioHentai | `MioHentai` | `miohentai` | https://miohentai.com | 6 |
+| MissAV | `Missav` | `missav` | https://missav.ws | 8 |
 | MuchoHentai | `MuchoHentai` | `muchohentai` | https://muchohentai.com | — |
 | MundoHentai | `MundoHentai` | `mundohentai` | https://mundohentai.net | — |
 | NaughtyHentai | `NaughtyHentai` | `naughtyhentai` | https://www.naughtyhentai.com | — |
@@ -68,6 +71,8 @@ Every active source implements a latest section and is overridable in CloudStrea
 | Rule34 Paheal | `Rule34Paheal` | `rule34paheal` | https://rule34.paheal.net | — |
 | Rule34s | `Rule34s` | `rule34s` | https://rule34s.com | — |
 | Rule34Video | `Rule34Video` | `rule34video` | https://rule34video.com | — |
+| SexTB | `Sextb` | `sextb` | https://sextb.net | 3 |
+| SupJav | `Supjav` | `supjav` | https://supjav.com | 6 |
 | The JOI Database | `TheJoiDatabase` | `thejoidatabase` | https://www.the-joi-database.com | — |
 | 3DHentai | `ThreeDHentai` | `threehentai` | https://3dhentai.it.com | — |
 | UncensoredHentai | `UncensoredHentai` | `uncensoredhentai` | https://uncensoredhentai.xxx | 8 |
@@ -78,7 +83,7 @@ Every active source implements a latest section and is overridable in CloudStrea
 
 ## Sources with genre rows
 
-These **33** sources expose static home-screen browse rows. Rows that returned zero items were pruned; the counts below were verified with `provider_smoke.sh --genres`.
+These **37** sources expose static home-screen browse rows. Rows that returned zero items were pruned; the counts below were verified with `provider_smoke.sh --genres`.
 
 | Package | Rows |
 |---|---|
@@ -105,18 +110,22 @@ These **33** sources expose static home-screen browse rows. Rows that returned z
 | `hentaitv` | 8 |
 | `hentaiyes` | 5 |
 | `hentaiyoga` | 8 |
+| `javgg` | 5 |
 | `javguru` | 7 |
 | `miohentai` | 6 |
+| `missav` | 8 |
 | `nekopoi` | 1 |
 | `okioto` | 1 |
 | `oppai` | 8 |
+| `sextb` | 3 |
+| `supjav` | 6 |
 | `uncensoredhentai` | 8 |
 | `watchanimehentai` | 1 |
 | `watchhentai` | 8 |
 | `xanimeporn` | 1 |
 | `zhentube` | 1 |
 
-Distribution: **93** `/genre/`, **29** `/category/`, **19** `/tag/` (fallback), **10** `/genres/`, **6** `/rule34/`, **5** `/hentai/` — **162 total**.
+Distribution: **93** `/genre/`, **35** `/category/`, **24** `/tag/`, **10** `/genres/`, **8** `/en/genres/` (MissAV), **6** `/rule34/`, **5** `/hentai/`, **3** `/jav-*` (SexTB) — **184 total**.
 
 ## Removed in v3
 
@@ -131,6 +140,18 @@ These providers were deleted from the plugin because they had no working playbac
 | UnderHentai (`underhentai`) | Cloudflare timeout/403 for non-browser clients on every run |
 
 ## Site status
+
+MissAV, SupJav, SexTB and JavGG are the v4-v6 JAV additions and are not in the v3 sweep below.
+JavGuru was moved to the same NSFW/JAV type in v5. It sits behind a
+Cloudflare managed challenge: the provider uses CloudStream's `CloudflareKiller` in-app.
+MissAV, SupJav, SexTB and JavGG are Cloudflare-fronted and use `CloudflareKiller` in-app.
+JavGG was verified live: home 40, search 6, load + 1 HLS, and five tag rows returning 40 each.
+AvJiali was checked and skipped: it is a paid site whose public pages expose only trailer MP4s.
+SupJav's player chain was verified end to end from a saved detail page (HLS master
+returned 200). SexTB's AJAX player (`/ajax/player` + XOR) and direct-MP4 fallback were
+verified live (HLS returned 200). MissAV's packed player was verified from live HTML.
+A plain JVM run still reports an empty home for SupJav/MissAV until the app has a
+clearance cookie; SexTB happens to pass on the JVM.
 
 Final v3 sweep: **62 of 64 passed** end to end (home → details → episodes → links) with `provider_smoke.sh`. The two misses are intermittent, not structural:
 

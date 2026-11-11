@@ -54,6 +54,9 @@ open class AniyomiProvider(
         TvType.AsianDrama,
     )
 
+    /** Sources that are not anime can override this (e.g. MissAV -> NSFW). */
+    open val preferredType: TvType? = null
+
     override val mainPage = mainPageOf(
         *buildList {
             add("popular" to "Popular")
@@ -133,7 +136,7 @@ open class AniyomiProvider(
 
         if (episodes.size == 1) {
             val only = episodes.first()
-            newMovieLoadResponse(title, url, TvType.Movie, abs(only.url) ?: url) {
+            newMovieLoadResponse(title, url, preferredType ?: TvType.Movie, abs(only.url) ?: url) {
                 this.posterUrl = poster
                 this.plot = plot
                 this.tags = tags
@@ -147,7 +150,7 @@ open class AniyomiProvider(
                     if (ep.date_upload > 0L) this.date = ep.date_upload
                 }
             }
-            newTvSeriesLoadResponse(title, url, TvType.Anime, list) {
+            newTvSeriesLoadResponse(title, url, preferredType ?: TvType.Anime, list) {
                 this.posterUrl = poster
                 this.plot = plot
                 this.tags = tags

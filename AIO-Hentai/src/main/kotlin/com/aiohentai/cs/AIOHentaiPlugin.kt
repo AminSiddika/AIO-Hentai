@@ -1,6 +1,7 @@
 package com.aiohentai.cs
 
 import android.content.Context
+import com.aiohentai.cs.compat.AppContext
 import com.aiohentai.cs.sites.akih.AkiHProvider
 import com.aiohentai.cs.sites.animeidhentai.AnimeIdHentaiProvider
 import com.aiohentai.cs.sites.animesex.AnimeSexProvider
@@ -44,8 +45,10 @@ import com.aiohentai.cs.sites.hentaiyes.HentaiYesProvider
 import com.aiohentai.cs.sites.hentaiyoga.HentaiYogaProvider
 import com.aiohentai.cs.sites.hentaverse.HentaverseProvider
 import com.aiohentai.cs.sites.hstream.HStreamProvider
+import com.aiohentai.cs.sites.javgg.JavggProvider
 import com.aiohentai.cs.sites.javguru.JavGuruProvider
 import com.aiohentai.cs.sites.miohentai.MioHentaiProvider
+import com.aiohentai.cs.sites.missav.MissavProvider
 import com.aiohentai.cs.sites.muchohentai.MuchoHentaiProvider
 import com.aiohentai.cs.sites.mundohentai.MundoHentaiProvider
 import com.aiohentai.cs.sites.naughtyhentai.NaughtyHentaiProvider
@@ -58,6 +61,8 @@ import com.aiohentai.cs.sites.r34tube.R34TubeProvider
 import com.aiohentai.cs.sites.rule34paheal.Rule34PahealProvider
 import com.aiohentai.cs.sites.rule34s.Rule34sProvider
 import com.aiohentai.cs.sites.rule34video.Rule34VideoProvider
+import com.aiohentai.cs.sites.sextb.SextbProvider
+import com.aiohentai.cs.sites.supjav.SupjavProvider
 import com.aiohentai.cs.sites.thejoidatabase.TheJoiDatabaseProvider
 import com.aiohentai.cs.sites.threehentai.ThreeDHentaiProvider
 import com.aiohentai.cs.sites.uncensoredhentai.UncensoredHentaiProvider
@@ -71,6 +76,7 @@ import com.lagradost.cloudstream3.plugins.Plugin
 @CloudstreamPlugin
 class AIOHentaiPlugin : Plugin() {
     override fun load(context: Context) {
+        AppContext.value = context
         registerMainAPI(WatchHentaiProvider())
         registerMainAPI(HentaiCityProvider())
         registerMainAPI(MuchoHentaiProvider())
@@ -87,6 +93,7 @@ class AIOHentaiPlugin : Plugin() {
         registerMainAPI(TheJoiDatabaseProvider())
         registerMainAPI(HentaiHavenComProvider())
         registerMainAPI(MioHentaiProvider())
+        registerMainAPI(MissavProvider())
         registerMainAPI(AkiHProvider())
         registerMainAPI(HentaiGemProvider())
         registerMainAPI(HanimeHentaiProvider())
@@ -113,6 +120,8 @@ class AIOHentaiPlugin : Plugin() {
         registerMainAPI(MundoHentaiProvider())
         registerMainAPI(HanimeRedProvider())
         registerMainAPI(Rule34VideoProvider())
+        registerMainAPI(SextbProvider())
+        registerMainAPI(SupjavProvider())
         registerMainAPI(HentaiHavenXxxProvider())
         registerMainAPI(AnimeSexProvider())
         registerMainAPI(ThreeDHentaiProvider())
@@ -135,5 +144,6 @@ class AIOHentaiPlugin : Plugin() {
         registerMainAPI(Hentai222Provider())
         registerMainAPI(CartoonPornProvider())
         registerMainAPI(JavGuruProvider())
+        registerMainAPI(JavggProvider())
     }
 }

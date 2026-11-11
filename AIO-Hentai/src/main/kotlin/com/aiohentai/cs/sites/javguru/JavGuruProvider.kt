@@ -1,5 +1,9 @@
 package com.aiohentai.cs.sites.javguru
 
 import com.aiohentai.cs.compat.AniyomiProvider
+import com.lagradost.cloudstream3.TvType
 
-class JavGuruProvider : AniyomiProvider(JavGuru())
+class JavGuruProvider : AniyomiProvider(JavGuru()) {
+    override val supportedTypes = setOf(TvType.NSFW, TvType.Movie)
+    override val preferredType = TvType.NSFW
+}

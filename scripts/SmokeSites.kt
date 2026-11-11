@@ -44,8 +44,10 @@ import com.aiohentai.cs.sites.hentaiyes.HentaiYes
 import com.aiohentai.cs.sites.hentaiyoga.HentaiYoga
 import com.aiohentai.cs.sites.hentaverse.Hentaverse
 import com.aiohentai.cs.sites.hstream.HStream
+import com.aiohentai.cs.sites.javgg.Javgg
 import com.aiohentai.cs.sites.javguru.JavGuru
 import com.aiohentai.cs.sites.miohentai.MioHentai
+import com.aiohentai.cs.sites.missav.Missav
 import com.aiohentai.cs.sites.muchohentai.MuchoHentai
 import com.aiohentai.cs.sites.mundohentai.MundoHentai
 import com.aiohentai.cs.sites.naughtyhentai.NaughtyHentai
@@ -58,6 +60,8 @@ import com.aiohentai.cs.sites.r34tube.R34Tube
 import com.aiohentai.cs.sites.rule34paheal.Rule34Paheal
 import com.aiohentai.cs.sites.rule34s.Rule34s
 import com.aiohentai.cs.sites.rule34video.Rule34Video
+import com.aiohentai.cs.sites.sextb.Sextb
+import com.aiohentai.cs.sites.supjav.Supjav
 import com.aiohentai.cs.sites.thejoidatabase.TheJoiDatabase
 import com.aiohentai.cs.sites.threehentai.ThreeDHentai
 import com.aiohentai.cs.sites.uncensoredhentai.UncensoredHentai
@@ -111,8 +115,10 @@ fun smokeSites(): List<Pair<String, () -> AnimeHttpSource>> = listOf(
     "HentaiYoga" to { HentaiYoga() },
     "Hentaverse" to { Hentaverse() },
     "HStream" to { HStream() },
+    "Javgg" to { Javgg() },
     "JavGuru" to { JavGuru() },
     "MioHentai" to { MioHentai() },
+    "Missav" to { Missav() },
     "MuchoHentai" to { MuchoHentai() },
     "MundoHentai" to { MundoHentai() },
     "NaughtyHentai" to { NaughtyHentai() },
@@ -125,6 +131,8 @@ fun smokeSites(): List<Pair<String, () -> AnimeHttpSource>> = listOf(
     "Rule34Paheal" to { Rule34Paheal() },
     "Rule34s" to { Rule34s() },
     "Rule34Video" to { Rule34Video() },
+    "Sextb" to { Sextb() },
+    "Supjav" to { Supjav() },
     "TheJoiDatabase" to { TheJoiDatabase() },
     "ThreeDHentai" to { ThreeDHentai() },
     "UncensoredHentai" to { UncensoredHentai() },
