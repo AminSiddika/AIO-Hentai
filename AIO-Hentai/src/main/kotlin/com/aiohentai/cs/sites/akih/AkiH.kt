@@ -122,16 +122,42 @@ class AkiH : AnimeHttpSource() {
                 if (!serverUrl.startsWith("http")) continue
                 val page = fetchText(serverUrl, watchUrl) ?: continue
                 val token = STREAM_TOKEN.find(page)?.groupValues?.get(1) ?: continue
-                val url = "https://aki-h.stream/file/$token/"
-                add(MediaVideo.create(url, "$name (HLS)", url))
+                val master = "https://aki-h.stream/file/$token/"
+                addAll(renditions(master, name))
             }
         }.distinctBy { it.url }
     }
+
+    /**
+     * `/file/<token>/` is an HLS master playlist, but with no `.m3u8` in the URL.
+     * Split it into quality-labelled entries so the app can pick a rendition.
+     */
+    private fun renditions(master: String, label: String): List<Video> {
+        val playlist = fetchText(master, null) ?: return listOf(fallback(master, label))
+        val out = mutableListOf<Video>()
+        var height: Int? = null
+        for (raw in playlist.lineSequence()) {
+            val line = raw.trim()
+            if (line.startsWith("#EXT-X-STREAM-INF")) {
+                height = RESOLUTION.find(line)?.groupValues?.get(1)?.toIntOrNull()
+            } else if (line.isNotEmpty() && !line.startsWith("#") && height != null) {
+                val quality = "${height}p (HLS)"
+                out += MediaVideo.create(line, quality, line)
+                height = null
+            }
+        }
+        return out.ifEmpty { listOf(fallback(master, label)) }
+    }
+
+    private fun fallback(master: String, label: String): Video =
+        MediaVideo.create(master, "$label (HLS)", master)
 
     private fun fetchText(url: String, referer: String?): String? = runCatching {
         val builder = Request.Builder()
             .url(url)
             .header("User-Agent", DESKTOP_UA)
+            // the stream host answers the literal "null" without an Accept header
+            .header("Accept", "*/*")
             .header("Accept-Language", "en-US,en;q=0.9")
         referer?.let { builder.header("Referer", it) }
         client.newCall(builder.build()).execute().use { it.body?.string() }
@@ -144,5 +170,6 @@ class AkiH : AnimeHttpSource() {
 
         private val WATCH_ID = Regex("""/(?:watch|videos)/([A-Za-z0-9]+)/""")
         private val STREAM_TOKEN = Regex("""aki-h\.stream/v/([A-Za-z0-9]+)""")
+        private val RESOLUTION = Regex("""RESOLUTION=\d+x(\d+)""")
     }
 }

@@ -1,6 +1,7 @@
 package com.aiohentai.cs.compat
 
 import com.lagradost.cloudstream3.Episode
+import com.lagradost.cloudstream3.ErrorLoadingException
 import com.lagradost.cloudstream3.HomePageResponse
 import com.lagradost.cloudstream3.LoadResponse
 import com.lagradost.cloudstream3.MainAPI
@@ -17,6 +18,7 @@ import com.lagradost.cloudstream3.newMovieSearchResponse
 import com.lagradost.cloudstream3.newSearchResponseList
 import com.lagradost.cloudstream3.newTvSeriesLoadResponse
 import com.lagradost.cloudstream3.utils.ExtractorLink
+import com.lagradost.cloudstream3.utils.ExtractorLinkType
 import com.lagradost.cloudstream3.utils.Qualities
 import com.lagradost.cloudstream3.utils.getQualityFromName
 import com.lagradost.cloudstream3.utils.newExtractorLink
@@ -53,8 +55,14 @@ open class AniyomiProvider(
     )
 
     override val mainPage = mainPageOf(
-        "popular" to "Popular",
-        "latest" to "Latest",
+        *buildList {
+            add("popular" to "Popular")
+            add("latest" to "Latest")
+            for ((genreName, path) in src.genres) {
+                if (genreName.equals("Popular", true) || genreName.equals("Latest", true)) continue
+                add("$GENRE_PREFIX$path" to genreName)
+            }
+        }.toTypedArray(),
     )
 
     // ------------------------------------------------------------------ home
@@ -64,16 +72,29 @@ open class AniyomiProvider(
         request: MainPageRequest,
     ): HomePageResponse = withContext(Dispatchers.IO) {
         prepare()
-        val result = if (request.data == "latest") {
-            src.latestUpdates(page)
-        } else {
-            src.popularAnime(page)
+        val result = when {
+            request.data.startsWith(GENRE_PREFIX) ->
+                genreSection(request.data.removePrefix(GENRE_PREFIX), page)
+            request.data == "latest" -> src.latestUpdates(page)
+            else -> src.popularAnime(page)
         }
         newHomePageResponse(
             request.name,
             result.animes.mapNotNull { it.toSearchResult() },
             result.hasNextPage,
         )
+    }
+
+    /** A genre/category listing page, parsed with the source's own list parser. */
+    private fun genreSection(path: String, page: Int): AnimesPage {
+        if (path.isBlank()) return AnimesPage(emptyList(), false)
+        val fetched = src.fetch(src.genrePageUrl(path, page))
+        // Sources differ in which parser handles a plain listing page.
+        for (parse in listOf(src::latestUpdatesParse, src::popularAnimeParse, src::searchAnimeParse)) {
+            val parsed = runCatching { parse(fetched.response()) }.getOrNull() ?: continue
+            if (parsed.animes.isNotEmpty()) return parsed
+        }
+        return AnimesPage(emptyList(), false)
     }
 
     // ---------------------------------------------------------------- search
@@ -94,7 +115,7 @@ open class AniyomiProvider(
         prepare()
         val page = src.fetch(url)
         val details = src.details(page)
-        val episodes = runCatching { src.episodes(page) }.getOrDefault(emptyList())
+        val episodes = src.episodes(page)
 
         val title = details.title.ifBlank { "Untitled" }
         val poster = abs(details.thumbnail_url)
@@ -105,8 +126,14 @@ open class AniyomiProvider(
             ?.filter { it.isNotEmpty() }
             ?.takeIf { it.isNotEmpty() }
 
-        if (episodes.size <= 1) {
-            newMovieLoadResponse(title, url, TvType.Movie, url) {
+        if (episodes.isEmpty()) {
+            // Entry exists but the site has no playable episode for it yet.
+            throw ErrorLoadingException("No episodes available")
+        }
+
+        if (episodes.size == 1) {
+            val only = episodes.first()
+            newMovieLoadResponse(title, url, TvType.Movie, abs(only.url) ?: url) {
                 this.posterUrl = poster
                 this.plot = plot
                 this.tags = tags
@@ -145,8 +172,16 @@ open class AniyomiProvider(
             val link = video.videoUrl.ifBlank { video.url }
             if (link.isBlank() || !seen.add(link)) continue
 
+            // Some hosts serve an HLS master playlist from an extension-less URL
+            // (e.g. /file/<token>/), so the label is the only hint CloudStream gets.
+            val type = if (link.contains(".m3u8", true) || video.quality.contains("hls", true)) {
+                ExtractorLinkType.M3U8
+            } else {
+                null
+            }
+
             callback.invoke(
-                newExtractorLink(src.name, video.quality, link) {
+                newExtractorLink(src.name, video.quality, link, type) {
                     this.referer = src.baseUrl.trimEnd('/') + "/"
                     this.quality = qualityOf(video.quality)
                     val headers = video.headers?.toMap()
@@ -197,5 +232,9 @@ open class AniyomiProvider(
             lower.contains("240") -> Qualities.P240.value
             else -> Qualities.Unknown.value
         }
+    }
+
+    private companion object {
+        const val GENRE_PREFIX = "genre|"
     }
 }

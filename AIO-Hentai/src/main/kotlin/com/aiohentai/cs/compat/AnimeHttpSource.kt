@@ -24,6 +24,27 @@ abstract class AnimeHttpSource {
     /** Opt-in proxy flag carried over from the Aniyomi extensions. */
     var mediaUseProxy: Boolean = false
 
+    /**
+     * Extra browse rows for the home screen: display name -> site path.
+     * Static because CloudStream reads `mainPage` synchronously.
+     */
+    open val genres: List<Pair<String, String>>
+        get() = Genres.bySite[javaClass.packageName.substringAfterLast('.')].orEmpty()
+
+    open fun genrePageUrl(path: String, page: Int): String {
+        val base = when {
+            path.startsWith("http://") || path.startsWith("https://") -> path
+            path.startsWith("/") -> baseUrl.trimEnd('/') + path
+            else -> baseUrl.trimEnd('/') + "/" + path
+        }
+        if (page <= 1) return base
+        return when {
+            base.contains("?") -> "$base&page=$page"
+            base.endsWith("/") -> "${base}page/$page/"
+            else -> "$base/page/$page/"
+        }
+    }
+
     open fun popularAnimeRequest(page: Int): Request =
         throw NotImplementedError("popularAnimeRequest")
 

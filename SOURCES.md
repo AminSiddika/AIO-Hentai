@@ -83,6 +83,7 @@ episodes) and `scripts/provider_smoke.sh` (adapter -> links).
 
 | Source | Status |
 |---|---|
+| Aki-H | details-only entries have no episode; the player moved to `streaming.aki.today` and serves an extension-less HLS master. Both handled in v2 |
 | AnimeIDHentai | payload is now JSON-escaped in the page; fixed in this port (60 items) |
 | Hentai.TV | same escaping fix (57 items) |
 | Hentaigasm | `hentaigasm.com` does not resolve — dead until the domain moves |

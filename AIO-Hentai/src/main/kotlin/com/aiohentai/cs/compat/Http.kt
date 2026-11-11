@@ -53,6 +53,18 @@ val httpClient: OkHttpClient by lazy {
         .followRedirects(true)
         .followSslRedirects(true)
         .retryOnConnectionFailure(true)
+        // Some hosts answer garbage (a literal "null") when Accept is missing, which
+        // breaks scrapers that build their own Request instead of using GET(url, headers).
+        .addInterceptor { chain ->
+            val request = chain.request()
+            if (request.header("Accept") != null) return@addInterceptor chain.proceed(request)
+            chain.proceed(
+                request.newBuilder()
+                    .header("Accept", "*/*")
+                    .header("Accept-Language", "en-US,en;q=0.9")
+                    .build(),
+            )
+        }
         .build()
 }
 
