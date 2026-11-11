@@ -84,6 +84,8 @@ subprojects {
 
         // android's org.json is provided by the host app at runtime
         compileOnly("org.json:json:20240303")
+        // jsoup 1.22 annotates its API with jspecify; needed at compile time.
+        compileOnly("org.jspecify:jspecify:1.0.0")
     }
 }
 

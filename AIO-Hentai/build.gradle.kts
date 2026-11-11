@@ -1,8 +1,8 @@
-version = 2
+version = 3
 
 cloudstream {
     language = "en"
-    description = "69 adult anime/hentai video sources ported from the Aniyomi Animetail extension suite"
+    description = "64 adult anime/hentai video sources ported from the Aniyomi Animetail extension suite"
     authors = listOf("JalebiBae")
     status = 2
     tvTypes = listOf("Movie", "Anime", "TvSeries", "AsianDrama")

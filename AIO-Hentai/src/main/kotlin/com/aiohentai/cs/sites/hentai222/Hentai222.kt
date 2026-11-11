@@ -59,7 +59,7 @@ class Hentai222 : AnimeHttpSource() {
                     this.title = title
                     thumbnail_url = img?.attr("data-src")?.takeIf { it.isNotBlank() }
                         ?: img?.absUrl("src")
-                        ?: link.attr("data-bg")?.takeIf { it.isNotBlank() }
+                        ?: link.attr("data-bg").takeIf { it.isNotBlank() }
                 }
             }
             .distinctBy { it.url }

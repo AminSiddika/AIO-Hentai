@@ -130,7 +130,7 @@ class Hentaverse : AnimeHttpSource() {
 
     companion object {
         private val SERIES = Regex(
-            """\\"name\\":\\"([^"\\]+)\\",\\"description\\":.*?\\"slug\\":\\"([^"\\]+)\\",\\"image\\":\\"([^"\\]+)\\"""",
+            """\\"name\\":\\"([^"\\]+)\\",\\"description\\":.*?\\"slug\\":\\"([^"\\]+)\\",\\"image\\":\\"([^"\\]+)\\",\\"seriesType\\":""",
             RegexOption.DOT_MATCHES_ALL,
         )
         private val EPISODE = Regex("""(?i)(?:episode|ep)[\s-]*(\d+)""")

@@ -1,189 +1,361 @@
-# AIO-Hentai — Handoff / Status
+# AIO-Hentai — Engineering Handoff
 
-Last updated: **2026-11-11 18:10 (UTC+6)**
+Snapshot: **v3 working tree**, based on upstream commit `75d07d3`.
+Upstream: <https://github.com/AminSiddika/AIO-Hentai>
 
-CloudStream 4 plugin containing **69 NSFW video sources** ported from the Aniyomi
-extension suite at `~/animetail-extensions` (github: `AminSiddika/animetail-extensions`).
+A CloudStream 4 plugin that ships **64 adult (NSFW) video providers** in one `.cs3`.
+The scrapers are ported from the Aniyomi suite
+[`AminSiddika/animetail-extensions`](https://github.com/AminSiddika/animetail-extensions);
+the only new code is a small compatibility layer plus one adapter per source.
 
-- Repo: https://github.com/AminSiddika/AIO-Hentai
-- Install URL (jsDelivr, preferred): `https://cdn.jsdelivr.net/gh/AminSiddika/AIO-Hentai@builds/repo.json`
-- Install URL (GitHub raw): `https://raw.githubusercontent.com/AminSiddika/AIO-Hentai/main/repo.json`
-- Direct plugin list: `https://raw.githubusercontent.com/AminSiddika/AIO-Hentai/builds/plugins.json`
-- Plugin version: **2** (`AIO-Hentai/build.gradle.kts`, `version = 2`)
+> **Publishing note:** `main`/`builds` still serve **v2** (69 sources). This working tree
+> is **v3** (64 sources) and has not been pushed. CI will publish v3 after the version
+> bump and push are committed.
 
 ---
 
-## 1. How it is built
+## 1. Current state
 
-The Aniyomi scrapers were **not rewritten**. Each one is compiled as-is against a small
-compatibility layer, so all the site selectors, player deobfuscation and proxy code stay
-exactly as they were debugged.
-
-```
-AIO-Hentai/src/main/kotlin/com/aiohentai/cs/
-  AIOHentaiPlugin.kt          @CloudstreamPlugin, registers all 69 providers
-  compat/
-    AnimeHttpSource.kt        Aniyomi's source contract + genre browse helpers
-    AniyomiProvider.kt        MainAPI adapter (the only real logic on the CS side)
-    Model.kt                  SAnime / SEpisode / Video / AnimesPage / AnimeFilter
-    Http.kt                   GET(), asJsoup(), replayable bodies, cookie jar, headers
-    MediaVideo.kt             playback wrapper (UA + Referer/Origin per site)
-    Genres.kt                 GENERATED genre/category rows per source
-  sites/<site>/<Source>.kt    ported scraper, unchanged site logic
-  sites/<site>/<Source>Provider.kt
-scripts/                      port, typecheck, smoke tests, genre generation
-```
-
-Mapping (`compat/AniyomiProvider.kt`):
-
-| CloudStream | Aniyomi source |
+| Item | Value |
 |---|---|
-| `getMainPage(page, request)` | `popularAnime` / `latestUpdates` / genre listing |
+| Plugin version | `3` (`AIO-Hentai/build.gradle.kts`) |
+| Providers registered | 64 |
+| Kotlin files | 135 (64 scrapers + 64 provider wrappers + 6 compat + 1 plugin) |
+| Genre rows | 33 sites, 162 verified rows |
+| Removed in v3 | H-Anime, Hentai-JP, HentaiCloud, Hentaigasm, UnderHentai |
+| Final sweep | 62/64 passed end to end; 2 slow/throttled (EroticHentai, XAnimePorn), both pass on retry |
+| Local build | **success** — 244 KB `.cs3` (249,721 bytes), zero compiler warnings |
+| Local build requirement | JDK 17+ and Android SDK 36 |
+| Test requirement | JDK + `kotlinc` + network; **no** Android SDK |
+
+Install URLs (unchanged):
+
+```
+https://raw.githubusercontent.com/AminSiddika/AIO-Hentai/main/repo.json
+https://cdn.jsdelivr.net/gh/AminSiddika/AIO-Hentai@main/repo.json
+```
+
+`repo.json` is a manifest; its `pluginLists` entry points at `builds/plugins.json`,
+which carries the real `.cs3` URL, version and SHA-256 hash.
+
+---
+
+## 2. Repository map
+
+```
+AIO-Hentai/
+  build.gradle.kts              plugin metadata + cloudstream block
+  src/main/AndroidManifest.xml  empty <manifest />
+  src/main/kotlin/com/aiohentai/cs/
+    AIOHentaiPlugin.kt          @CloudstreamPlugin, registers all 64 providers
+    compat/
+      AnimeHttpSource.kt        Aniyomi source contract + fetch/parse helpers + genre URL rules
+      AniyomiProvider.kt        MainAPI adapter — the only real CloudStream-side logic
+      Model.kt                  SAnime / SEpisode / Video / AnimesPage / AnimeFilter*
+      Http.kt                   OkHttp client, cookie jar, GET(), asJsoup(), replayable bodies
+      MediaVideo.kt             playback wrapper (UA + Referer/Origin, optional egress proxy)
+      Genres.kt                 GENERATED static genre/category rows per source
+    sites/<package>/<Source>.kt          ported scraper (site logic unchanged)
+    sites/<package>/<Source>Provider.kt  one-line wrapper: AniyomiProvider(<Source>())
+scripts/                        port, typecheck, live smoke tests, generators, genre prune
+scripts/android-stub/           desktop stubs for android.content.Context / android.util.Base64
+.github/workflows/build.yml     builds and force-publishes to the builds branch
+```
+
+Every site provider is exactly this shape:
+
+```kotlin
+class WatchHentaiProvider : AniyomiProvider(WatchHentai())
+```
+
+If an adapter rule needs to change, change `compat/AniyomiProvider.kt` once.
+
+---
+
+## 3. Architecture
+
+### 3.1 Compatibility layer
+
+The port keeps Aniyomi's class and field names, so the scrapers' selectors and player
+decoders did not need rewriting.
+
+| Aniyomi API | Compat replacement |
+|---|---|
+| `AnimeHttpSource` | `compat.AnimeHttpSource` (request/parse pair contract) |
+| `SAnime`, `SEpisode`, `AnimesPage`, `Video` | `compat.Model.kt` (same field names) |
+| `AnimeFilter`, `AnimeFilterList` | `compat.Model.kt` |
+| `GET()`, `asJsoup()` | `compat.Http.kt` |
+| `MediaVideo` | `compat.MediaVideo.kt` |
+
+### 3.2 Scraper contract
+
+`AnimeHttpSource` exposes the methods the scrapers already implement:
+
+- browsing: `popularAnimeRequest/Parse`, `latestUpdatesRequest/Parse`,
+  `searchAnimeRequest/Parse`
+- details: `animeDetailsParse`, `episodeListParse`
+- playback: `videoListRequest`, `videoListParse`
+- filters: `getFilterList`
+
+Additional helpers supplied by the compat layer:
+
+- `fetch(request|url)` returns a buffered `FetchedPage` whose body can be replayed.
+  Several scrapers call `response.asJsoup()` more than once.
+- `details(page)`, `episodes(page)`, `videos(page)`, `popularAnime(page)`, etc.
+- `genres` is read from `Genres.bySite[<package>]`.
+- `genrePageUrl(path, page)` defaults to WordPress-style `path/page/N/`, or `&page=N`
+  when the path already has a query string.
+
+### 3.3 CloudStream adapter (`AniyomiProvider`)
+
+| CloudStream | Source call |
+|---|---|
+| `getMainPage(page, request)` | `popularAnime` for `"popular"`, `latestUpdates` for `"latest"`, list parse for `genre\|<path>` |
 | `search(query, page)` | `searchAnime` |
 | `load(url)` | `animeDetailsParse` + `episodeListParse` |
 | `loadLinks(data, …)` | `videoListParse` → `ExtractorLink` |
 
-Rules encoded in the adapter:
+Provider flags:
 
-- **0 episodes** → `ErrorLoadingException("No episodes available")` (details-only entries).
-- **1 episode** → `MovieLoadResponse`, `dataUrl` = that episode's URL (not the page URL).
-- **>1 episodes** → `TvSeriesLoadResponse`.
-- Links labelled with `HLS` (or containing `.m3u8`) are emitted as `ExtractorLinkType.M3U8`,
-  because some hosts serve playlists from extension-less URLs.
-- `MediaVideo.referer` is set per provider before parsing (it was a global in Aniyomi and
-  would leak between 69 providers in one plugin).
+- `canBeOverridden = true` — users can change each source's base URL.
+- `hasChromecastSupport = false` — localhost proxies and hotlink-protected URLs do not cast.
+- `supportedTypes = Movie, TvSeries, Anime, AsianDrama`.
+- `hasQuickSearch = false`; `hasMainPage = true`.
 
-Re-importing sources after changing them upstream:
+Adapter rules:
+
+1. **0 episodes** → `ErrorLoadingException("No episodes available")`.
+2. **1 episode** → `MovieLoadResponse`, with `dataUrl` set to the episode URL.
+3. **>1 episodes** → `TvSeriesLoadResponse`; season `1`, episode numbers only when `> 0`.
+4. **HLS detection**: link is `ExtractorLinkType.M3U8` when the URL contains `.m3u8`
+   **or** the quality label contains `hls` (Aki-H serves an extension-less master).
+5. **Referer isolation**: `prepare()` sets `MediaVideo.referer` and `useProxy` from the
+   source before every home/search/load/links call.
+6. **Link dedupe**: repeated and blank URLs are dropped.
+
+`mainPage` is `Popular`, `Latest`, and every `genre|<path>` row except duplicates of
+those names. Rows are static because CloudStream reads `mainPage` synchronously.
+
+### 3.4 HTTP
+
+`compat/Http.kt` owns one lazy `OkHttpClient`:
+
+- Chrome 124 desktop UA and browser-like `Accept`/`Accept-Language`
+- in-memory cookie jar keyed by host
+- 30 s connect/read/write, 60 s call timeout, redirects followed
+- interceptor adds `Accept: */*` + `Accept-Language` only when a raw request omitted them
+- `asJsoup()` strips a UTF-8 BOM and uses the response URL as base URI
+- `FetchedPage.response()` re-wraps an in-memory `ReplayableBody`
+
+Aki-H and EroticHentai both needed site-specific header workarounds: Aki-H's stream host
+returns `null` without `Accept`, and EroticHentai's API stalls when gzip or a pooled
+connection is used (`Accept-Encoding: identity` + `Connection: close`).
+
+### 3.5 Playback (`MediaVideo`)
+
+`MediaVideo.create(url, quality, videoUrl?, headers?)` sets a browser UA, `Referer`,
+derived `Origin`, and keeps scraper headers. If `useProxy` is true and the target is not
+`.mpd`, it rewrites through `https://animextension.mobiusdie.workers.dev/api/proxy`.
+
+No scraper sets `mediaUseProxy = true`, so the worker proxy is dormant. The only
+in-process proxy is `WatchHentai.VideoProxy` (NanoHTTPD, Range-aware).
+
+### 3.6 Genre rows (`Genres.kt`)
+
+Generated by `scripts/gen_genres.py`, verified with `provider_smoke.sh --genres`, and
+pruned by `scripts/prune_genres.py`.
+
+- **33 of 64 sites** expose rows
+- **162 rows total**: 93 `/genre/`, 29 `/category/`, 19 `/tag/`, 10 `/genres/`,
+  6 `/rule34/`, 5 `/hentai/`
+- **31 sites** have no static taxonomy (JS menus, no browse pages, tags only in search)
+
+v3 fixes that made previously empty rows work:
+
+| Source | Fix |
+|---|---|
+| HentaiSea | accept `/watch/` cards on genre pages |
+| HentaiYoga | accept `/watch/` cards on category pages |
+| MioHentai | accept `a.tag-card-link` on tag pages |
+| HentaiHavenXxx | accept `/rule34/video/` cards and fall back to a single episode |
+| Nekopoi | accept category episode posts and fall back to a single episode |
+| HentaiVideos | genre pages are unprefixed A-Z indexes, so its 8 rows were pruned |
+
+Rows that returned zero and were removed: 15 (8 HentaiVideos, 4 empty Nekopoi
+categories, 1 HAnime download row, 1 HentaiHorizon trailing-space path, 1
+HentaiTubeOnline empty 3D path).
+
+---
+
+## 4. Sources removed in v3
+
+Deleted directories, registrations and genre rows:
+
+| Source | Package | Why |
+|---|---|---|
+| H-Anime | `hanime` | Doodstream embeds removed; `doodst.com` returns “Video is Unavailable” |
+| Hentai-JP | `hentaijp` | both `serverData` mirrors unavailable |
+| HentaiCloud | `hentaicloud` | origin unreachable (no route to host) |
+| Hentaigasm | `hentaigasm` | domain no longer resolves |
+| UnderHentai | `underhentai` | Cloudflare timeout/403 for non-browser clients on every run |
+
+The remaining slow-but-working sources were kept: EroticHentai, HentaiStream,
+XAnimePorn, Hentai0.
+
+---
+
+## 5. Adding or re-importing a source
 
 ```bash
-python3 scripts/port.py      # copies ../animetail-extensions scrapers into sites/
+python3 scripts/port.py
 ```
 
-Note: `port.py` overwrites `sites/<site>/<Source>.kt`. Local fixes (Aki-H, AnimeIDHentai,
-Hentai.TV) will be **lost** unless they are also applied in the Aniyomi repo or re-applied
-after porting.
+`port.py` copies each upstream module's `class X : AnimeHttpSource()` file, rewrites
+imports, writes `sites/<site>/X.kt`, and generates `XProvider.kt`.
 
-## 2. Build & publish
+Caveats:
 
-CI: `.github/workflows/build.yml` — on push to `main` it runs `./gradlew make makePluginsJson`
-and force-publishes to the `builds` branch:
+- `SRC` defaults to `../animetail-extensions`; override with `ANIMETAIL_EXTENSIONS`.
+- It **overwrites** `sites/<site>/<Source>.kt`; upstream the local fixes or re-apply them.
+- Upstream class names must match exactly; duplicate class names are reported.
 
-```
-AIO-Hentai.cs3  (~256 KB, dex + manifest.json)
-plugins.json
-repo.json
-repo-jsdelivr.json
-AIO-Hentai/icon.png
-```
+Manual checklist:
 
-Release process:
+1. Add `sites/<package>/<Source>.kt` and `<Source>Provider.kt`.
+2. Register in `AIOHentaiPlugin.load()`.
+3. Regenerate `scripts/SmokeSites.kt` (`python3 scripts/gen_smoke.py`).
+4. Optionally add `Genres.bySite["<package>"]` and verify it.
+5. Update `SOURCES.md`.
+6. Bump `version` in `AIO-Hentai/build.gradle.kts`.
+7. Typecheck and smoke it.
 
-1. Change code.
-2. Bump `version = N` in `AIO-Hentai/build.gradle.kts` (CloudStream compares this).
-3. `git commit && git push` — CI builds and publishes; users get an update automatically.
+---
 
-## 3. Tests (all run on a JVM, no Android SDK)
+## 6. Build
 
 ```bash
-./scripts/setup_env.sh        # downloads CloudStream classes.jar + libs into ~/.cache/cs3
-./scripts/typecheck.sh        # compiles all sources against the real CloudStream API
-./scripts/smoke.sh            # scraper level, live: home -> details -> episodes (69 sites)
-./scripts/smoke.sh --links HentaiCity
-./scripts/provider_smoke.sh WatchHentai HentaiCity      # adapter level: home/search/load/links
+./gradlew make makePluginsJson
+# -> AIO-Hentai/build/AIO-Hentai.cs3
+# -> build/plugins.json
+```
+
+Toolchain: Gradle 9.3.1, AGP 9.1.0, Kotlin 2.3.20, `compileSdk 36`, `minSdk 21`,
+JVM target 1.8. Runtime libs: jsoup 1.22.2, OkHttp 4.12.0, NanoHTTPD 2.3.1,
+coroutines 1.10.2; `org.json` is `compileOnly`.
+
+CI (`.github/workflows/build.yml`) runs on push to `main`/`master` except Markdown-only
+changes, builds with JDK 17 + Android 36, and force-pushes artifacts to `builds`:
+`AIO-Hentai.cs3`, `plugins.json`, `repo.json`, `repo-jsdelivr.json`, icon.
+
+Release: bump `version`, commit, push. CloudStream compares `version` in `plugins.json`.
+
+---
+
+## 7. Tests (JVM, no device)
+
+```bash
+./scripts/setup_env.sh                 # CloudStream classes.jar + libs -> ~/.cache/cs3
+./scripts/typecheck.sh                 # compile all 135 .kt files
+./scripts/smoke.sh WatchHentai         # scraper level
+./scripts/provider_smoke.sh WatchHentai HentaiCity Hentai0
 ./scripts/provider_smoke.sh AkiH --url <seriesUrl>
-./scripts/provider_smoke.sh --genres                    # genre rows, one line per row
+./scripts/provider_smoke.sh --genres   # every row with item counts
+python3 scripts/prune_genres.py /tmp/genres.log [--dry-run]
 ```
 
-Last full scraper sweep (before the Aki-H/genre work):
+The scripts now run outside Termux:
+
+- `scripts/android-stub/` supplies `android.content.Context` and a real
+  `android.util.Base64` implementation.
+- `port.py`, `gen_smoke.py`, `gen_genres.py`, `typecheck.sh`, `smoke.sh` and
+  `provider_smoke.sh` derive paths from the repo; `KOTLINC` is overridable.
+- `setup_env.sh` falls back to Python when curl cannot resolve DNS.
+- `gen_genres.py` scans the sources when the old audit TSV is absent.
+- `prune_genres.py` removes rows that returned 0 items and leaves failed sites alone.
+
+To run locally on macOS: install JDK 17+ and a Kotlin compiler (2.3.20 was used here),
+then export `JAVA_HOME`/`PATH` and run the commands above. The CloudStream `classes.jar`
+and all Maven libs are downloaded into `~/.cache/cs3`.
+
+### v3 results
 
 ```
-summary: ok=65 failed=4 total=69
-HentaiCloud    dead domain (www host unreachable)
-Hentaigasm     DNS does not resolve
-NsfwR34        origin returned HTTP 522 during the run (passed earlier)
-HentaiStream   read timeout (passed on retry)
+provider summary: ok=62 failed=2 total=64
+EroticHentai  transient: aniporn.com API throttles repeated requests (passes on retry)
+XAnimePorn    slow: times out under full-sweep concurrency (passes when run alone)
 ```
 
-## 4. Genre / category rows (v2)
+Earlier individual retries: EroticHentai → 1 link, Hentai0 → 5 links,
+HentaiStream → 1 link, XAnimePorn → 4 links.
 
-CloudStream reads `mainPage` synchronously, so genre rows must be static. `Genres.kt` is
-generated by `scripts/gen_genres.py`, which walks each site's own navigation:
+Canonical adapter check:
 
-1. `/genre/…` or `/category/…` links on the home page
-2. otherwise, the same links on an index page (`/genre/`, `/genres/`, `/hentai-genre/`, …)
-3. otherwise `/tag/…` links (fallback, max 6 rows)
+```
+[Hentai0]     MovieLoadResponse    -> 5 links (240p/360p/480p/720p/1080p)
+[HentaiCity]  MovieLoadResponse    -> 2 links (MP4 + HLS)
+[WatchHentai] TvSeriesLoadResponse -> 2 links (localhost proxy + direct)
+[AkiH]        TvSeriesLoadResponse -> 3 HLS renditions (1080p/720p/360p)
+```
 
-**38 of 69 sites** produced rows (117 `/genre/`, 36 `/category/`, 17 `/genres/`, tag
-fallbacks for the rest). 32 sites have no discoverable taxonomy (JS menus, tags only in
-search, or no browse pages).
+---
 
-Section URL for page > 1: `path/page/N/` (WordPress default), `&page=N` when the path has a
-query. Override `genrePageUrl(path, page)` per source if a site differs.
-
-Listing parsing reuses the source's own `latestUpdatesParse` → `popularAnimeParse` →
-`searchAnimeParse`, whichever returns items first.
-
-**Not yet verified end-to-end**: the genre rows were generated but the sweep
-(`provider_smoke.sh --genres`) has not been run to completion, so some rows may render
-empty. Run it and delete the rows that return 0 items from `Genres.kt` (or re-run
-`gen_genres.py` with those paths excluded).
-
-## 5. Aki-H fix (v2, needs on-device confirmation)
-
-Two independent problems:
-
-1. **Details-only entries** (`/custom-udon/`) have no episodes → previously produced a
-   broken "Movie" screen. Now the adapter raises a clear error.
-2. **Player moved**: servers API `https://v.aki-h.com/api/servers/<watchId>` now returns
-   `streaming.aki.today` players whose stream is an **extension-less HLS master**
-   `https://aki-h.stream/file/<token>/`. Fixes applied:
-   - `Accept: */*` header — the stream host returns the literal string `null` without it
-     (verified with curl: `-H "Accept:"` → 4 bytes, with it → playlist).
-   - Global OkHttp interceptor adds `Accept`/`Accept-Language` when missing, so any source
-     building raw requests is covered.
-   - Master playlist is split into `1080p/720p/360p (HLS)` rows.
-
-Verified in isolation with curl (playlist 200, renditions 200); the JVM run could not be
-completed because the site started rate-limiting (503) and the Termux JVM had intermittent
-DNS failures for `aki-h.com`. **Confirm in the app** on a series with episodes, e.g.
-`https://aki-h.com/ane-wa-yanmama-junyuu-chuu/` (4 episodes).
-
-## 6. Known site issues
+## 8. Known issues
 
 | Source | Status |
 |---|---|
-| Hentaigasm | `hentaigasm.com` does not resolve — dead until the domain moves |
-| HentaiCloud | `www.hentaicloud.com` unreachable (apex 301s to it) |
-| NsfwR34 | origin returns 522 intermittently |
-| UnderHentai | Cloudflare 403 to non-browser clients |
-| AnimeIDHentai | payload is JSON-escaped in the page; fixed in this port. Player (`nhplayer.com`) uses proof-of-work + fingerprint and may still refuse |
-| MuchoHentai, Ohentai, hanime.tv, Hentaiking | Cloudflare-fronted, first request can be slow |
+| EroticHentai | API host throttles repeated calls; first request after a pause succeeds |
+| HentaiStream | slow first request; passed in the final sweep |
+| Hentai0 | occasional read timeout under load; passed in the final sweep |
+| XAnimePorn | slow; times out under full-sweep concurrency, returns 4 quality links when run alone |
+| MuchoHentai, Ohentai, hanime.tv, Hentaiking | Cloudflare-fronted; first request can be slow |
+| WatchHentai | in-process NanoHTTPD proxy; Chromecast disabled by design |
 
-Every provider supports URL override in CloudStream settings (`canBeOverridden = true`),
-so a moved domain does not need a release.
+Aki-H was confirmed in v3: home filters `/custom-udon/`, load returns 20 episodes and
+3 HLS renditions. AnimeIDHentai/Hentai.TV unescape fixes remain local to this port.
 
-## 7. Gotchas learned the hard way
+---
 
-- **Repository URL**: the app reports `Invalid URL` + a JSON parse error when the URL 404s.
-  A 404 body is 14 bytes (`404: Not Found`) — that error always means a wrong/stale URL.
-  The old name `animetail-cloudstream` no longer exists.
-- **jsDelivr** mirror exists because some ISPs block `raw.githubusercontent.com`.
-- Gradle Kotlin DSL: inside `subprojects { dependencies { … } }` every configuration needs
-  `val X by configurations` — a bare `compileOnly(...)` fails script compilation.
-- `android-actions/setup-android@v3` fails on current runners (its own `sdkmanager --licenses`
-  exits 1); v4 + explicit `sdkmanager "platforms;android-36"` works.
-- jsoup 1.22 needs `org.jspecify:jspecify` on the compile classpath.
-- Several scrapers call `response.asJsoup()` twice per page; the compat body must therefore
-  be replayable (custom `ResponseBody`, not `ByteArray.toResponseBody`).
-- `MediaVideo` / proxies: plugin runs in the CloudStream process, so `127.0.0.1` NanoHTTPD
-  proxies and range requests still work; Chromecast is disabled per provider because those
-  localhost links cannot be cast.
+## 9. Open items
 
-## 8. Next steps
+1. Commit and push v3; confirm CI publishes `"version": 3` to `builds/plugins.json`
+   (the local build already produces a 249,721-byte `.cs3` with the expected hash).
+2. Confirm Aki-H, Hentai2w, Hentaverse and EroticHentai playback on a device.
+3. Re-run `provider_smoke.sh --genres` after the next network change; add rows only when
+   a listing returns items.
+4. 31 sites still have no browse rows (no static taxonomy).
+5. Apply the parser/header fixes upstream in `animetail-extensions` so `port.py`
+   does not reintroduce them.
+6. Decide whether the dormant `MediaVideo` worker proxy should be removed.
 
-1. Push (v2) and confirm CI is green; check `builds/plugins.json` has `"version": 2`.
-2. Confirm Aki-H plays in the app; if the master playlist rows show, delete the fallback.
-3. Run `provider_smoke.sh --genres`, prune rows returning 0 items.
-4. Optionally recover genre rows for the 32 sites without a taxonomy (needs per-site work).
-5. Optional: apply the same JSON-unescape fix (AnimeIDHentai/Hentai.TV) and the Aki-H player
-   fix to `../animetail-extensions` so `port.py` does not reintroduce the bugs.
+---
+
+## 10. Gotchas
+
+- **Invalid repository URL**: CloudStream reports a JSON parse error when the URL 404s
+  (`404: Not Found`, 14 bytes). That always means a wrong/stale URL.
+- **jsDelivr mirror** exists for networks that block `raw.githubusercontent.com`.
+- **Gradle Kotlin DSL**: inside `subprojects { dependencies { … } }`, fetch each
+  configuration with `val X by configurations`.
+- **Android setup action**: `setup-android@v3` fails on current runners; v4 plus
+  `sdkmanager "platforms;android-36"` works.
+- **jsoup 1.22** needs `org.jspecify:jspecify` on the compile classpath; `build.gradle.kts` now declares it (without it the build warns and Kotlin 2.4 will fail).
+- **Replayable bodies**: scrapers call `asJsoup()` twice; keep `FetchedPage`.
+- **Referer leakage**: never reintroduce a global `MediaVideo.referer`.
+- **Redirect cookies**: read `Set-Cookie` from the 302 for Laravel age gates
+  (Hentai2w); a following client hides it.
+- **Gzip hang**: EroticHentai's API needs `Accept-Encoding: identity` + `Connection: close`.
+- **Docs-only commits** do not trigger CI (`paths-ignore: *.md`).
+- **`port.py` overwrites** scraper files; keep local fixes in a patch or upstream them.
+
+---
+
+## 11. Quick verification
+
+```bash
+grep -c 'registerMainAPI' AIO-Hentai/src/main/kotlin/com/aiohentai/cs/AIOHentaiPlugin.kt   # 64
+find AIO-Hentai/src -name '*.kt' | wc -l                                                  # 135
+grep -c ' to listOf(' AIO-Hentai/src/main/kotlin/com/aiohentai/cs/compat/Genres.kt       # 33
+grep -o '" to "/' AIO-Hentai/src/main/kotlin/com/aiohentai/cs/compat/Genres.kt | wc -l    # 162
+```
+
+If those counts drift, update this file and `SOURCES.md` in the same commit.

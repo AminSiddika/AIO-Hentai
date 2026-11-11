@@ -15,9 +15,10 @@ import subprocess
 import sys
 from concurrent.futures import ThreadPoolExecutor
 
-ROOT = "/data/data/com.termux/files/home/AIO-Hentai"
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SITES = os.path.join(ROOT, "AIO-Hentai/src/main/kotlin/com/aiohentai/cs/sites")
 OUT = os.path.join(ROOT, "AIO-Hentai/src/main/kotlin/com/aiohentai/cs/compat/Genres.kt")
-AUDIT = "/data/data/com.termux/files/usr/tmp/opencode/genre_audit.txt"
+AUDIT = os.environ.get("GENRE_AUDIT", os.path.join(ROOT, "scripts/genre_audit.txt"))
 MAX_GENRES = 8
 MAX_TAGS = 6
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -112,11 +113,36 @@ def genres_for(site: str, base: str):
     return site, []
 
 
-def main():
+def load_targets():
+    """Read the audit TSV when present, otherwise scan the ported sources."""
+    if os.path.exists(AUDIT):
+        targets = []
+        for line in open(AUDIT, encoding="utf-8"):
+            parts = line.rstrip("\n").split("\t")
+            if len(parts) == 3:
+                targets.append(tuple(parts))
+        if targets:
+            return targets
+
     targets = []
-    for line in open(AUDIT, encoding="utf-8"):
-        site, _name, url = line.rstrip("\n").split("\t")
-        targets.append((site, url))
+    for site in sorted(os.listdir(SITES)):
+        directory = os.path.join(SITES, site)
+        if not os.path.isdir(directory):
+            continue
+        for name in sorted(os.listdir(directory)):
+            if name.endswith("Provider.kt") or not name.endswith(".kt"):
+                continue
+            text = open(os.path.join(directory, name), encoding="utf-8").read()
+            url = re.search(r'override val baseUrl\s*=\s*"([^"]+)"', text)
+            if url:
+                label = re.search(r'override val name\s*=\s*"([^"]+)"', text)
+                targets.append((site, label.group(1) if label else site, url.group(1)))
+                break
+    return targets
+
+
+def main():
+    targets = load_targets()
 
     result = {}
     with ThreadPoolExecutor(max_workers=12) as pool:

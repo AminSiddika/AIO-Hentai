@@ -50,7 +50,8 @@ class HentaiSea : AnimeHttpSource() {
         val doc = response.asJsoup()
         val items = doc.select("article.item")
             .mapNotNull { article ->
-                val link = article.selectFirst("a[href^='https://hentaisea.com/videos/']")
+                val link = article.selectFirst("a[href*='/watch/']")
+                    ?: article.selectFirst("a[href*='/videos/']")
                     ?: return@mapNotNull null
                 val href = link.absUrl("href").ifBlank { link.attr("href") }
                 val img = article.selectFirst("img")
@@ -58,7 +59,8 @@ class HentaiSea : AnimeHttpSource() {
                     setUrlWithoutDomain(href)
                     title = article.selectFirst("h3")?.text()?.trim()
                         ?: img?.attr("alt")?.trim().orEmpty()
-                    thumbnail_url = img?.absUrl("src")
+                    thumbnail_url = img?.absUrl("data-src")?.takeIf { it.isNotBlank() }
+                        ?: img?.absUrl("src")
                 }
             }
             .distinctBy { it.url }

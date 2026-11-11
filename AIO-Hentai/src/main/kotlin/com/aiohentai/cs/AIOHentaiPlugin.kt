@@ -6,7 +6,6 @@ import com.aiohentai.cs.sites.animeidhentai.AnimeIdHentaiProvider
 import com.aiohentai.cs.sites.animesex.AnimeSexProvider
 import com.aiohentai.cs.sites.cartoonporn.CartoonPornProvider
 import com.aiohentai.cs.sites.erotichentai.EroticHentaiProvider
-import com.aiohentai.cs.sites.hanime.HAnimeProvider
 import com.aiohentai.cs.sites.hanimehentai.HanimeHentaiProvider
 import com.aiohentai.cs.sites.hanimered.HanimeRedProvider
 import com.aiohentai.cs.sites.hanimetv.HanimeTvProvider
@@ -18,11 +17,9 @@ import com.aiohentai.cs.sites.hentai4k.Hentai4kProvider
 import com.aiohentai.cs.sites.hentaiastra.HentaiAstraProvider
 import com.aiohentai.cs.sites.hentaibros.HentaibrosProvider
 import com.aiohentai.cs.sites.hentaicity.HentaiCityProvider
-import com.aiohentai.cs.sites.hentaicloud.HentaiCloudProvider
 import com.aiohentai.cs.sites.hentaifor.HentaiForProvider
 import com.aiohentai.cs.sites.hentaifox.HentaiFoxProvider
 import com.aiohentai.cs.sites.hentaifreak.HentaiFreakProvider
-import com.aiohentai.cs.sites.hentaigasm.HentaigasmProvider
 import com.aiohentai.cs.sites.hentaigem.HentaiGemProvider
 import com.aiohentai.cs.sites.hentaihaven.HentaiHavenProvider
 import com.aiohentai.cs.sites.hentaihavencom.HentaiHavenComProvider
@@ -30,7 +27,6 @@ import com.aiohentai.cs.sites.hentaihavenred.HentaiHavenRedProvider
 import com.aiohentai.cs.sites.hentaihavenxxx.HentaiHavenXxxProvider
 import com.aiohentai.cs.sites.hentaihd.HentaiHDProvider
 import com.aiohentai.cs.sites.hentaihorizon.HentaiHorizonProvider
-import com.aiohentai.cs.sites.hentaijp.HentaiJpProvider
 import com.aiohentai.cs.sites.hentaiking.HentaiKingProvider
 import com.aiohentai.cs.sites.hentaimama.HentaiMamaProvider
 import com.aiohentai.cs.sites.hentaimoon.HentaiMoonProvider
@@ -65,7 +61,6 @@ import com.aiohentai.cs.sites.rule34video.Rule34VideoProvider
 import com.aiohentai.cs.sites.thejoidatabase.TheJoiDatabaseProvider
 import com.aiohentai.cs.sites.threehentai.ThreeDHentaiProvider
 import com.aiohentai.cs.sites.uncensoredhentai.UncensoredHentaiProvider
-import com.aiohentai.cs.sites.underhentai.UnderHentaiProvider
 import com.aiohentai.cs.sites.watchanimehentai.WatchAnimeHentaiProvider
 import com.aiohentai.cs.sites.watchhentai.WatchHentaiProvider
 import com.aiohentai.cs.sites.xanimeporn.XAnimePornProvider
@@ -106,15 +101,12 @@ class AIOHentaiPlugin : Plugin() {
         registerMainAPI(HentaiHavenRedProvider())
         registerMainAPI(HentaiVideosProvider())
         registerMainAPI(HentaiForProvider())
-        registerMainAPI(HentaiJpProvider())
-        registerMainAPI(HentaiCloudProvider())
         registerMainAPI(HStreamProvider())
         registerMainAPI(HentaiKingProvider())
         registerMainAPI(HentaiYesProvider())
         registerMainAPI(HentaiFoxProvider())
         registerMainAPI(HentaibrosProvider())
         registerMainAPI(EroticHentaiProvider())
-        registerMainAPI(HAnimeProvider())
         registerMainAPI(HentaverseProvider())
         registerMainAPI(OppaiProvider())
         registerMainAPI(NekopoiProvider())
@@ -135,10 +127,8 @@ class AIOHentaiPlugin : Plugin() {
         registerMainAPI(WatchAnimeHentaiProvider())
         registerMainAPI(XAnimePornProvider())
         registerMainAPI(OkiotoProvider())
-        registerMainAPI(UnderHentaiProvider())
         registerMainAPI(HentaiAstraProvider())
         registerMainAPI(HanimeTvProvider())
-        registerMainAPI(HentaigasmProvider())
         registerMainAPI(Hentai4kProvider())
         registerMainAPI(HentaistreamTvProvider())
         registerMainAPI(Rule34PahealProvider())

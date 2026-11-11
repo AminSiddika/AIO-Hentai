@@ -1,8 +1,8 @@
 # AIO-Hentai (CloudStream)
 
-A CloudStream 4 plugin that exposes the 69 sources from the
+A CloudStream 4 plugin that exposes the 64 sources from the
 [Animetail Aniyomi extension suite](https://github.com/AminSiddika/animetail-extensions)
-as CloudStream providers. One `.cs3`, one install, 69 sources.
+as CloudStream providers. One `.cs3`, one install, 64 sources.
 
 All sources are adult (NSFW) English video sites.
 
@@ -54,8 +54,8 @@ local NanoHTTPD proxies stay exactly as they were debugged in the Aniyomi extens
 ### Differences from the Aniyomi build
 
 - `MediaVideo.referer` was a global per-APK; here each provider sets it before parsing
-  videos, so 69 sources in one plugin do not leak referers into each other.
-- Several sources start a localhost NanoHTTPD proxy for range requests; that still works
+  videos, so 64 sources in one plugin do not leak referers into each other.
+- Only WatchHentai starts a localhost NanoHTTPD proxy for range requests; that still works
   because the plugin runs inside the CloudStream process.
 - Chromecast support is disabled per provider, since localhost proxy links cannot be cast.
 - Cloudflare challenges are handled by CloudStream itself, not by the Aniyomi extension's
@@ -65,7 +65,10 @@ local NanoHTTPD proxies stay exactly as they were debugged in the Aniyomi extens
 ## Sources
 
 Generated from `AIO-Hentai/src/main/kotlin/com/aiohentai/cs/sites` — see
-`SOURCES.md` for the full list with base URLs.
+`SOURCES.md` for the full list with base URLs and genre-row counts.
+
+v3 removed five providers with no working playback path: H-Anime, Hentai-JP,
+HentaiCloud, Hentaigasm and UnderHentai. `SOURCES.md` records why.
 
 ## Build
 
@@ -101,7 +104,7 @@ git push -u origin builds
 `~/.cache/cs3`, so everything below runs on a plain JVM — no Android SDK, no device.
 
 ```bash
-./scripts/typecheck.sh                        # all 138 files against the real CS API
+./scripts/typecheck.sh                        # all 135 files against the real CS API
 ./scripts/smoke.sh WatchHentai HentaiCity     # scraper level: home, details, episodes
 ./scripts/smoke.sh --links HentaiCity         # also resolve video links
 ./scripts/provider_smoke.sh WatchHentai       # adapter level: getMainPage/search/load/loadLinks
@@ -119,7 +122,7 @@ What the adapter test proves end to end (WatchHentai, HentaiCity, Hentai0):
 
 ```
 AIO-Hentai/src/main/kotlin/com/aiohentai/cs/
-  AIOHentaiPlugin.kt          plugin entry, registers 69 providers
+  AIOHentaiPlugin.kt          plugin entry, registers 64 providers
   compat/                     Aniyomi-API compatibility layer
   sites/<site>/<Source>.kt    the ported scraper (unchanged site logic)
   sites/<site>/<Source>Provider.kt

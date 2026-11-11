@@ -111,6 +111,11 @@ class EroticHentai : AnimeHttpSource() {
                     .url(api)
                     .header("User-Agent", DESKTOP_UA)
                     .header("Referer", "https://aniporn.com/embed/$id/")
+                    .header("Accept", "application/json")
+                    // This endpoint stalls when OkHttp advertises gzip or reuses a
+                    // pooled connection, so force a plain one-shot request.
+                    .header("Accept-Encoding", "identity")
+                    .header("Connection", "close")
                     .build(),
             ).execute().use { it.body?.string() }
         }.getOrNull() ?: return emptyList()

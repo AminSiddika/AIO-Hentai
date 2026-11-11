@@ -39,16 +39,24 @@ class HentaiYoga : AnimeHttpSource() {
 
     private fun parseList(response: Response): AnimesPage {
         val doc = response.asJsoup()
-        val items = doc.select("a[href*='/series/'][href*='/episode/']")
+        val seriesLinks = doc.select("a[href*='/series/'][href*='/episode/']")
+        val links = if (seriesLinks.isNotEmpty()) {
+            seriesLinks
+        } else {
+            // Genre/category pages list /watch/<slug> entries instead of series episodes.
+            doc.select("a[href*='/watch/']")
+        }
+        val items = links
             .mapNotNull { link ->
                 val href = link.absUrl("href").ifBlank { link.attr("href") }
-                if (!href.contains("/episode/")) return@mapNotNull null
+                if (!href.contains("/episode/") && !href.contains("/watch/")) return@mapNotNull null
                 val img = link.selectFirst("img")
                 SAnime.create().apply {
                     setUrlWithoutDomain(href)
                     title = img?.attr("alt")?.trim()
                         ?: link.attr("title").ifBlank { link.text() }.trim()
-                    thumbnail_url = img?.absUrl("src")
+                    thumbnail_url = img?.absUrl("data-src")?.takeIf { it.isNotBlank() }
+                        ?: img?.absUrl("src")
                 }
             }
             .distinctBy { it.url }

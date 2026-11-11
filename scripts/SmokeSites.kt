@@ -6,7 +6,6 @@ import com.aiohentai.cs.sites.animeidhentai.AnimeIdHentai
 import com.aiohentai.cs.sites.animesex.AnimeSex
 import com.aiohentai.cs.sites.cartoonporn.CartoonPorn
 import com.aiohentai.cs.sites.erotichentai.EroticHentai
-import com.aiohentai.cs.sites.hanime.HAnime
 import com.aiohentai.cs.sites.hanimehentai.HanimeHentai
 import com.aiohentai.cs.sites.hanimered.HanimeRed
 import com.aiohentai.cs.sites.hanimetv.HanimeTv
@@ -18,11 +17,9 @@ import com.aiohentai.cs.sites.hentai4k.Hentai4k
 import com.aiohentai.cs.sites.hentaiastra.HentaiAstra
 import com.aiohentai.cs.sites.hentaibros.Hentaibros
 import com.aiohentai.cs.sites.hentaicity.HentaiCity
-import com.aiohentai.cs.sites.hentaicloud.HentaiCloud
 import com.aiohentai.cs.sites.hentaifor.HentaiFor
 import com.aiohentai.cs.sites.hentaifox.HentaiFox
 import com.aiohentai.cs.sites.hentaifreak.HentaiFreak
-import com.aiohentai.cs.sites.hentaigasm.Hentaigasm
 import com.aiohentai.cs.sites.hentaigem.HentaiGem
 import com.aiohentai.cs.sites.hentaihaven.HentaiHaven
 import com.aiohentai.cs.sites.hentaihavencom.HentaiHavenCom
@@ -30,7 +27,6 @@ import com.aiohentai.cs.sites.hentaihavenred.HentaiHavenRed
 import com.aiohentai.cs.sites.hentaihavenxxx.HentaiHavenXxx
 import com.aiohentai.cs.sites.hentaihd.HentaiHD
 import com.aiohentai.cs.sites.hentaihorizon.HentaiHorizon
-import com.aiohentai.cs.sites.hentaijp.HentaiJp
 import com.aiohentai.cs.sites.hentaiking.HentaiKing
 import com.aiohentai.cs.sites.hentaimama.HentaiMama
 import com.aiohentai.cs.sites.hentaimoon.HentaiMoon
@@ -65,7 +61,6 @@ import com.aiohentai.cs.sites.rule34video.Rule34Video
 import com.aiohentai.cs.sites.thejoidatabase.TheJoiDatabase
 import com.aiohentai.cs.sites.threehentai.ThreeDHentai
 import com.aiohentai.cs.sites.uncensoredhentai.UncensoredHentai
-import com.aiohentai.cs.sites.underhentai.UnderHentai
 import com.aiohentai.cs.sites.watchanimehentai.WatchAnimeHentai
 import com.aiohentai.cs.sites.watchhentai.WatchHentai
 import com.aiohentai.cs.sites.xanimeporn.XAnimePorn
@@ -78,7 +73,6 @@ fun smokeSites(): List<Pair<String, () -> AnimeHttpSource>> = listOf(
     "AnimeSex" to { AnimeSex() },
     "CartoonPorn" to { CartoonPorn() },
     "EroticHentai" to { EroticHentai() },
-    "HAnime" to { HAnime() },
     "HanimeHentai" to { HanimeHentai() },
     "HanimeRed" to { HanimeRed() },
     "HanimeTv" to { HanimeTv() },
@@ -90,11 +84,9 @@ fun smokeSites(): List<Pair<String, () -> AnimeHttpSource>> = listOf(
     "HentaiAstra" to { HentaiAstra() },
     "Hentaibros" to { Hentaibros() },
     "HentaiCity" to { HentaiCity() },
-    "HentaiCloud" to { HentaiCloud() },
     "HentaiFor" to { HentaiFor() },
     "HentaiFox" to { HentaiFox() },
     "HentaiFreak" to { HentaiFreak() },
-    "Hentaigasm" to { Hentaigasm() },
     "HentaiGem" to { HentaiGem() },
     "HentaiHaven" to { HentaiHaven() },
     "HentaiHavenCom" to { HentaiHavenCom() },
@@ -102,7 +94,6 @@ fun smokeSites(): List<Pair<String, () -> AnimeHttpSource>> = listOf(
     "HentaiHavenXxx" to { HentaiHavenXxx() },
     "HentaiHD" to { HentaiHD() },
     "HentaiHorizon" to { HentaiHorizon() },
-    "HentaiJp" to { HentaiJp() },
     "HentaiKing" to { HentaiKing() },
     "HentaiMama" to { HentaiMama() },
     "HentaiMoon" to { HentaiMoon() },
@@ -137,7 +128,6 @@ fun smokeSites(): List<Pair<String, () -> AnimeHttpSource>> = listOf(
     "TheJoiDatabase" to { TheJoiDatabase() },
     "ThreeDHentai" to { ThreeDHentai() },
     "UncensoredHentai" to { UncensoredHentai() },
-    "UnderHentai" to { UnderHentai() },
     "WatchAnimeHentai" to { WatchAnimeHentai() },
     "WatchHentai" to { WatchHentai() },
     "XAnimePorn" to { XAnimePorn() },

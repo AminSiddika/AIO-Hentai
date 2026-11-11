@@ -56,8 +56,7 @@ class MundoHentai : AnimeHttpSource() {
                 SAnime.create().apply {
                     setUrlWithoutDomain(href)
                     title = img?.attr("alt")?.trim()
-                        ?: link.attr("title").trim()
-                        ?: link.text().trim()
+                        ?: link.attr("title").ifBlank { link.text() }.trim()
                     thumbnail_url = img?.absUrl("data-src")?.takeIf { it.isNotBlank() }
                         ?: img?.absUrl("src")
                 }

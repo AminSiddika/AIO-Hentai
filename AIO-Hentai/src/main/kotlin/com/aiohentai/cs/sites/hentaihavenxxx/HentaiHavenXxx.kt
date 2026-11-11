@@ -51,10 +51,17 @@ class HentaiHavenXxx : AnimeHttpSource() {
 
     private fun parseList(response: Response): AnimesPage {
         val doc = response.asJsoup()
-        val items = doc.select("a[href^=/watch/]")
+        val watchLinks = doc.select("a[href^=/watch/]")
+        val links = if (watchLinks.isNotEmpty()) {
+            watchLinks
+        } else {
+            // Rule34 category pages link straight to /rule34/video/<slug>/.
+            doc.select("a[href*='/rule34/video/']")
+        }
+        val items = links
             .mapNotNull { link ->
                 val href = link.absUrl("href").ifBlank { link.attr("href") }
-                if (!SERIES_URL.matches(href)) return@mapNotNull null
+                if (!SERIES_URL.matches(href) && !VIDEO_URL.matches(href)) return@mapNotNull null
                 val img = link.selectFirst("img")
                 SAnime.create().apply {
                     setUrlWithoutDomain(href)
@@ -91,7 +98,7 @@ class HentaiHavenXxx : AnimeHttpSource() {
 
     override fun episodeListParse(response: Response): List<SEpisode> {
         val seriesPath = response.request.url.encodedPath.trimEnd('/')
-        return response.asJsoup()
+        val episodes = response.asJsoup()
             .select("a[href]")
             .mapNotNull { link ->
                 val href = link.absUrl("href").ifBlank { link.attr("href") }
@@ -106,6 +113,17 @@ class HentaiHavenXxx : AnimeHttpSource() {
             }
             .distinctBy { it.url }
             .sortedBy { it.episode_number }
+
+        if (episodes.isNotEmpty()) return episodes
+
+        // Rule34 pages are single videos, not multi-episode series.
+        return listOf(
+            SEpisode.create().apply {
+                setUrlWithoutDomain(response.request.url.toString())
+                name = "Full Video"
+                episode_number = 1f
+            },
+        )
     }
 
     override fun videoListParse(response: Response): List<Video> {
@@ -125,6 +143,7 @@ class HentaiHavenXxx : AnimeHttpSource() {
 
     companion object {
         private val SERIES_URL = Regex("""^https://hentaihaven\.xxx/watch/[^/?#]+/?$""")
+        private val VIDEO_URL = Regex("""^https://hentaihaven\.xxx/rule34/video/[^/?#]+/?$""")
         private val EPISODE = Regex("""/episode-(\d+)""")
     }
 }

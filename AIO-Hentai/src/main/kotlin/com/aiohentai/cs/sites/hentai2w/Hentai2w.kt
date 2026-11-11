@@ -161,7 +161,14 @@ class Hentai2w : AnimeHttpSource() {
                 .header("Referer", "$baseUrl/")
                 .build()
             val value = runCatching {
-                client.newCall(request).execute().use { response ->
+                // /age-gate answers 302 with Set-Cookie: age_confirmed=... on the
+                // redirect itself. The shared client follows redirects, which would
+                // hide that header, so use a non-following clone for this call.
+                val noRedirect = client.newBuilder()
+                    .followRedirects(false)
+                    .followSslRedirects(false)
+                    .build()
+                noRedirect.newCall(request).execute().use { response ->
                     response.headers("Set-Cookie")
                         .firstOrNull { it.startsWith("age_confirmed=") }
                         ?.substringAfter("age_confirmed=")

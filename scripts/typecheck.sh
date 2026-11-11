@@ -1,16 +1,27 @@
-#!/data/data/com.termux/files/usr/bin/bash
+#!/usr/bin/env bash
 # Local typecheck of the plugin sources without the Android SDK.
 # Compiles against CloudStream's classes.jar + the runtime deps + desktop Android stubs.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 CACHE="${CS3_CACHE:-$HOME/.cache/cs3}"
-STUB_SRC="/data/data/com.termux/files/usr/tmp/opencode/android-stub"
+STUB_SRC="${ANDROID_STUB_SRC:-$ROOT/scripts/android-stub}"
 STUB_JAR="$CACHE/android-stub.jar"
+KOTLINC="${KOTLINC:-$(command -v kotlinc || true)}"
+
+if [ -z "$KOTLINC" ]; then
+  echo "kotlinc not found; install Kotlin or set KOTLINC=/path/to/kotlinc" >&2
+  exit 1
+fi
 
 if [ ! -f "$CACHE/cloudstream-classes.jar" ]; then
   echo "downloading test environment into $CACHE"
   "$(dirname "$0")/setup_env.sh"
+fi
+
+if [ ! -d "$STUB_SRC" ]; then
+  echo "Android stub sources not found at $STUB_SRC" >&2
+  exit 1
 fi
 
 if [ ! -f "$STUB_JAR" ] || [ -n "$(find "$STUB_SRC" -newer "$STUB_JAR" -name '*.java' 2>/dev/null)" ]; then
@@ -30,7 +41,7 @@ rm -rf "$OUT"
 mkdir -p "$OUT"
 
 set +e
-kotlinc -nowarn -jvm-target 1.8 -classpath "$CP" -d "$OUT" \
+"$KOTLINC" -nowarn -jvm-target 1.8 -classpath "$CP" -d "$OUT" \
   $(find "$SRC" -name '*.kt' | sort) >"$LOG" 2>&1
 status=$?
 set -e

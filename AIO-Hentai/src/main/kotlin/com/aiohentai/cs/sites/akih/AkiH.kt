@@ -51,6 +51,8 @@ class AkiH : AnimeHttpSource() {
                 val link = card.selectFirst("a.ak-card__poster[href]") ?: return@mapNotNull null
                 val href = link.absUrl("href").ifBlank { link.attr("href") }
                 if (href.isBlank()) return@mapNotNull null
+                // /custom-udon/ entries are details-only and expose no episodes.
+                if (href.contains("/custom-udon", ignoreCase = true)) return@mapNotNull null
 
                 SAnime.create().apply {
                     setUrlWithoutDomain(href)

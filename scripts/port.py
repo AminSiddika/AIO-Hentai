@@ -9,8 +9,9 @@ import os
 import re
 import sys
 
-SRC = "/data/data/com.termux/files/home/animetail-extensions"
-DST = "/data/data/com.termux/files/home/AIO-Hentai/AIO-Hentai/src/main/kotlin/com/aiohentai/cs/sites"
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SRC = os.environ.get("ANIMETAIL_EXTENSIONS", os.path.join(os.path.dirname(ROOT), "animetail-extensions"))
+DST = os.path.join(ROOT, "AIO-Hentai/src/main/kotlin/com/aiohentai/cs/sites")
 
 IMPORT_MAP = [
     ("eu.kanade.tachiyomi.animesource.model.", "com.aiohentai.cs.compat."),

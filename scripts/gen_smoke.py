@@ -3,8 +3,9 @@
 import os
 import re
 
-SITES = "/data/data/com.termux/files/home/AIO-Hentai/AIO-Hentai/src/main/kotlin/com/aiohentai/cs/sites"
-OUT = "/data/data/com.termux/files/home/AIO-Hentai/scripts/SmokeSites.kt"
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SITES = os.path.join(ROOT, "AIO-Hentai/src/main/kotlin/com/aiohentai/cs/sites")
+OUT = os.path.join(ROOT, "scripts/SmokeSites.kt")
 
 entries = []
 for site in sorted(os.listdir(SITES)):

@@ -81,7 +81,10 @@ class MioHentai : AnimeHttpSource() {
         val doc = response.asJsoup()
         val items = doc.select("article.blog-view")
             .mapNotNull { article ->
-                val link = article.selectFirst("a.post-thumbnail[href]") ?: return@mapNotNull null
+                val link = article.selectFirst("a.post-thumbnail[href]")
+                    ?: article.selectFirst("a.tag-card-link[href]")
+                    ?: article.selectFirst("a[href]")
+                    ?: return@mapNotNull null
                 val href = link.absUrl("href").ifBlank { link.attr("href") }
                 if (href.isBlank() || !ROOT_POST.matches(href)) return@mapNotNull null
 

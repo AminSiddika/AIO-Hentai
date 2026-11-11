@@ -1,10 +1,11 @@
-#!/data/data/com.termux/files/usr/bin/bash
+#!/usr/bin/env bash
 # Downloads everything the offline typecheck / smoke tests need:
 #   - CloudStream's plugin API (classes.jar from the pre-release build)
 #   - the runtime libraries the scrapers use
-#   - desktop stubs for the two Android classes they touch
+#   - desktop stubs for the Android classes they touch (see scripts/android-stub)
 set -euo pipefail
 
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 CACHE="${CS3_CACHE:-$HOME/.cache/cs3}"
 mkdir -p "$CACHE/libs"
 
@@ -14,7 +15,19 @@ fetch() {
     return
   fi
   echo "fetch $(basename "$out")"
-  curl -sfL -o "$out" "$url"
+  if command -v curl >/dev/null 2>&1 && curl -sfL --connect-timeout 20 -o "$out.part" "$url"; then
+    mv "$out.part" "$out"
+    return
+  fi
+  # Some environments resolve DNS for Python but not for curl.
+  python3 - "$url" "$out" <<'PY'
+import os, sys, urllib.request
+url, out = sys.argv[1], sys.argv[2]
+req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+with urllib.request.urlopen(req, timeout=120) as r, open(out + ".part", "wb") as f:
+    f.write(r.read())
+os.replace(out + ".part", out)
+PY
 }
 
 fetch "https://github.com/recloudstream/cloudstream/releases/download/pre-release/classes.jar" \
@@ -47,7 +60,7 @@ fetch "$M/dev/whyoleg/cryptography/cryptography-random-jvm/0.4.0/cryptography-ra
 fetch "$M/dev/whyoleg/cryptography/cryptography-provider-base-jvm/0.4.0/cryptography-provider-base-jvm-0.4.0.jar" "$CACHE/libs/cryptography-provider-base-jvm-0.4.0.jar"
 fetch "$M/dev/whyoleg/cryptography/cryptography-provider-jdk-jvm/0.4.0/cryptography-provider-jdk-jvm-0.4.0.jar" "$CACHE/libs/cryptography-provider-jdk-jvm-0.4.0.jar"
 
-KOTLIN_LIB="$(bash "$(dirname "$0")/print_kotlin_lib.sh")"
+KOTLIN_LIB="$(bash "$ROOT/scripts/print_kotlin_lib.sh")"
 cp -n "$KOTLIN_LIB" "$CACHE/libs/kotlin-stdlib.jar" 2>/dev/null || true
 cp -n "$(dirname "$KOTLIN_LIB")/kotlin-reflect.jar" "$CACHE/libs/kotlin-reflect.jar" 2>/dev/null || true
 

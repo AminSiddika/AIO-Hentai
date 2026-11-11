@@ -45,14 +45,16 @@ class Nekopoi : AnimeHttpSource() {
     private fun parseList(response: Response): AnimesPage {
         val doc = response.asJsoup()
         val azItems = doc.select("div.nk-az-item a.nk-series-link[href]")
-        val links = if (azItems.isNotEmpty()) {
-            azItems
-        } else {
-            doc.select("a[href^=https://nekopoi.care/hentai/]")
+        val links = when {
+            azItems.isNotEmpty() -> azItems
+            // Category pages list individual episode posts.
+            doc.select("a[href^=https://nekopoi.care/][href*=episode-]").isNotEmpty() ->
+                doc.select("a[href^=https://nekopoi.care/][href*=episode-]")
+            else -> doc.select("a[href^=https://nekopoi.care/hentai/]")
         }
         val items = links.mapNotNull { link ->
             val href = link.absUrl("href").ifBlank { link.attr("href") }
-            if (!SERIES_URL.matches(href)) return@mapNotNull null
+            if (!SERIES_URL.matches(href) && !EPISODE_POST.matches(href)) return@mapNotNull null
             val tooltip = link.attr("original-title")
             val thumb = if (tooltip.isNotBlank()) {
                 Jsoup.parse(tooltip).selectFirst("img")?.attr("src")?.takeIf { it.isNotBlank() }
@@ -89,8 +91,8 @@ class Nekopoi : AnimeHttpSource() {
         }
     }
 
-    override fun episodeListParse(response: Response): List<SEpisode> =
-        response.asJsoup()
+    override fun episodeListParse(response: Response): List<SEpisode> {
+        val cards = response.asJsoup()
             .select(".nk-episode-grid a.nk-episode-card[href]")
             .mapNotNull { link ->
                 val href = link.absUrl("href").ifBlank { link.attr("href") }
@@ -106,6 +108,18 @@ class Nekopoi : AnimeHttpSource() {
             }
             .distinctBy { it.url }
             .sortedBy { it.episode_number }
+
+        if (cards.isNotEmpty()) return cards
+
+        // A category listing links straight to an episode post, which has no episode grid.
+        return listOf(
+            SEpisode.create().apply {
+                setUrlWithoutDomain(response.request.url.toString())
+                name = "Full Video"
+                episode_number = 1f
+            },
+        )
+    }
 
     override fun videoListParse(response: Response): List<Video> {
         val episodeUrl = response.request.url.toString()
@@ -147,6 +161,7 @@ class Nekopoi : AnimeHttpSource() {
         private const val CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 
         private val SERIES_URL = Regex("""^https://nekopoi\.care/hentai/[^/?#]+/?$""")
-        private val EPISODE = Regex("""(?i)(?:episode|ep)[\s-]*(\d+)""")
+        private val EPISODE_POST = Regex("""^https://nekopoi\.care/[^/?#]+/?$""")
+        private val EPISODE = Regex("""(?i)(?:episode|ep)\s*-?\s*(\d+)""")
     }
 }
