@@ -10,19 +10,19 @@ import re
 import sys
 
 SRC = "/data/data/com.termux/files/home/animetail-extensions"
-DST = "/data/data/com.termux/files/home/cloudstream-animetail/Animetail/src/main/kotlin/com/animetail/cs/sites"
+DST = "/data/data/com.termux/files/home/AIO-Hentai/AIO-Hentai/src/main/kotlin/com/aiohentai/cs/sites"
 
 IMPORT_MAP = [
-    ("eu.kanade.tachiyomi.animesource.model.", "com.animetail.cs.compat."),
-    ("eu.kanade.tachiyomi.animesource.online.AnimeHttpSource", "com.animetail.cs.compat.AnimeHttpSource"),
-    ("eu.kanade.tachiyomi.network.GET", "com.animetail.cs.compat.GET"),
-    ("eu.kanade.tachiyomi.util.asJsoup", "com.animetail.cs.compat.asJsoup"),
-    ("eu.kanade.tachiyomi.animeextension.proxy.MediaVideo", "com.animetail.cs.compat.MediaVideo"),
+    ("eu.kanade.tachiyomi.animesource.model.", "com.aiohentai.cs.compat."),
+    ("eu.kanade.tachiyomi.animesource.online.AnimeHttpSource", "com.aiohentai.cs.compat.AnimeHttpSource"),
+    ("eu.kanade.tachiyomi.network.GET", "com.aiohentai.cs.compat.GET"),
+    ("eu.kanade.tachiyomi.util.asJsoup", "com.aiohentai.cs.compat.asJsoup"),
+    ("eu.kanade.tachiyomi.animeextension.proxy.MediaVideo", "com.aiohentai.cs.compat.MediaVideo"),
 ]
 
 
 def convert(text: str, site: str) -> str:
-    out = re.sub(r"^package .*$", f"package com.animetail.cs.sites.{site}", text, count=1, flags=re.M)
+    out = re.sub(r"^package .*$", f"package com.aiohentai.cs.sites.{site}", text, count=1, flags=re.M)
     for old, new in IMPORT_MAP:
         out = out.replace(old, new)
     if "eu.kanade." in out:
@@ -60,9 +60,9 @@ def main():
 
         with open(os.path.join(outdir, f"{cls}Provider.kt"), "w", encoding="utf-8") as fh:
             fh.write(
-                f"""package com.animetail.cs.sites.{site}
+                f"""package com.aiohentai.cs.sites.{site}
 
-import com.animetail.cs.compat.AniyomiProvider
+import com.aiohentai.cs.compat.AniyomiProvider
 
 class {cls}Provider : AniyomiProvider({cls}())
 """

@@ -74,11 +74,22 @@
 | @JalebiBae - XAnimePorn | `xanimeporn` | https://xanimeporn.com | yes |
 | @JalebiBae - ZhenTube | `zhentube` | https://zhentube.com | yes |
 
-## Known site status (checked 2026-11-11)
+## Site status
 
-- `hentaigasm.com` — DNS does not resolve; the provider will fail until the domain moves.
-- `www.hentaicloud.com` — the `www` host is dead, `https://hentaicloud.com` answers. Update `baseUrl` when the source is next touched.
-- `www.underhentai.net` — Cloudflare answers 403 to non-browser clients; may need CloudStream's challenge handling.
-- `muchohentai.com`, `ohentai.org`, `hanime.tv`, `hentaiking.com` — Cloudflare-fronted; first request can be slow.
+Checked from a clean client on 2026-11-11. 63 of 69 sources returned a home page,
+details and episodes; the rest:
 
-Everything else answered 200 to a plain GET.
+| Source | Status |
+|---|---|
+| AnimeIDHentai | payload is now JSON-escaped in the page; fixed in this port |
+| Hentai.TV | same escaping fix as AnimeIDHentai |
+| Hentaigasm | `hentaigasm.com` does not resolve — dead until the domain moves |
+| HentaiCloud | `www.hentaicloud.com` is dead; `https://hentaicloud.com` answers 200 |
+| Hentai0 | AJAX + XSRF flow; slow in the test run, browse may need the site's cookies |
+| UnderHentai | Cloudflare answers 403 to non-browser clients |
+
+Cloudflare-fronted sites (`muchohentai.com`, `ohentai.org`, `hanime.tv`, `hentaiking.com`,
+`underhentai.net`) can show a challenge on the first request.
+
+Use the provider's URL override in CloudStream settings to point a source at a new domain
+without waiting for a plugin update.

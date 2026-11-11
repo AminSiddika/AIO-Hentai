@@ -3,8 +3,8 @@
 import os
 import re
 
-SITES = "/data/data/com.termux/files/home/cloudstream-animetail/Animetail/src/main/kotlin/com/animetail/cs/sites"
-OUT = "/data/data/com.termux/files/home/cloudstream-animetail/scripts/SmokeSites.kt"
+SITES = "/data/data/com.termux/files/home/AIO-Hentai/AIO-Hentai/src/main/kotlin/com/aiohentai/cs/sites"
+OUT = "/data/data/com.termux/files/home/AIO-Hentai/scripts/SmokeSites.kt"
 
 entries = []
 for site in sorted(os.listdir(SITES)):
@@ -20,12 +20,12 @@ for site in sorted(os.listdir(SITES)):
             entries.append((site, m.group(1)))
 
 lines = [
-    "package com.animetail.cs.smoke",
+    "package com.aiohentai.cs.smoke",
     "",
-    "import com.animetail.cs.compat.AnimeHttpSource",
+    "import com.aiohentai.cs.compat.AnimeHttpSource",
 ]
 for site, cls in entries:
-    lines.append(f"import com.animetail.cs.sites.{site}.{cls}")
+    lines.append(f"import com.aiohentai.cs.sites.{site}.{cls}")
 
 lines += [
     "",

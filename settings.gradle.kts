@@ -1,3 +1,3 @@
-rootProject.name = "animetail-cloudstream"
+rootProject.name = "AIO-Hentai"
 
-include(":Animetail")
+include(":AIO-Hentai")

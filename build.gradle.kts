@@ -38,13 +38,13 @@ subprojects {
 
     cloudstream {
         setRepo(
-            System.getenv("GITHUB_REPOSITORY") ?: "AminSiddika/animetail-cloudstream"
+            System.getenv("GITHUB_REPOSITORY") ?: "AminSiddika/AIO-Hentai"
         )
         authors = listOf("JalebiBae")
     }
 
     android {
-        namespace = "com.animetail.cs"
+        namespace = "com.aiohentai.cs"
         compileSdk = 36
         defaultConfig {
             minSdk = 21

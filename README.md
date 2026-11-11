@@ -1,4 +1,4 @@
-# Animetail Extensions (CloudStream)
+# AIO-Hentai (CloudStream)
 
 A CloudStream 4 plugin that exposes the 69 sources from the
 [Animetail Aniyomi extension suite](https://github.com/AminSiddika/animetail-extensions)
@@ -12,10 +12,10 @@ All sources are adult (NSFW) English video sites.
 2. Paste the repository URL:
 
 ```
-https://raw.githubusercontent.com/AminSiddika/animetail-cloudstream/builds/plugins.json
+https://raw.githubusercontent.com/AminSiddika/AIO-Hentai/builds/plugins.json
 ```
 
-3. Install **Animetail** from the repository, then pick any of the sources in
+3. Install **AIO-Hentai** from the repository, then pick any of the sources in
    **Home → Anime/Movie**.
 
 `repo.json` at the repository root is the same repository in the short-code format
@@ -24,7 +24,7 @@ https://raw.githubusercontent.com/AminSiddika/animetail-cloudstream/builds/plugi
 ## How it is built
 
 The Aniyomi extensions were not rewritten. Each scraper is compiled as-is against a
-small compatibility layer (`com.animetail.cs.compat`) that reproduces the pieces of the
+small compatibility layer (`com.aiohentai.cs.compat`) that reproduces the pieces of the
 Aniyomi extension API they use:
 
 | Aniyomi type | Compat replacement |
@@ -59,7 +59,7 @@ local NanoHTTPD proxies stay exactly as they were debugged in the Aniyomi extens
 
 ## Sources
 
-Generated from `Animetail/src/main/kotlin/com/animetail/cs/sites` — see
+Generated from `AIO-Hentai/src/main/kotlin/com/aiohentai/cs/sites` — see
 `SOURCES.md` for the full list with base URLs.
 
 ## Build
@@ -74,7 +74,7 @@ Full plugin build (needs JDK 17 and the Android SDK):
 
 ```bash
 ./gradlew make makePluginsJson
-# -> Animetail/build/Animetail.cs3 and build/plugins.json
+# -> AIO-Hentai/build/AIO-Hentai.cs3 and build/plugins.json
 ```
 
 CI (`.github/workflows/build.yml`) builds on every push to `main` and force-pushes the
@@ -90,21 +90,31 @@ git add README.md && git commit -m "init builds"
 git push -u origin builds
 ```
 
-## Smoke tests
+## Tests
 
-The scrapers can be exercised on the JVM without an Android device:
+`scripts/setup_env.sh` downloads CloudStream's `classes.jar` and the runtime libs into
+`~/.cache/cs3`, so everything below runs on a plain JVM — no Android SDK, no device.
 
 ```bash
-./scripts/typecheck.sh
-./scripts/smoke.sh WatchHentai HentaiCity      # home, details, episodes
-./scripts/smoke.sh --links HentaiCity          # also resolve video links
+./scripts/typecheck.sh                        # all 138 files against the real CS API
+./scripts/smoke.sh WatchHentai HentaiCity     # scraper level: home, details, episodes
+./scripts/smoke.sh --links HentaiCity         # also resolve video links
+./scripts/provider_smoke.sh WatchHentai       # adapter level: getMainPage/search/load/loadLinks
+```
+
+What the adapter test proves end to end (WatchHentai, HentaiCity, Hentai0):
+
+```
+[Hentai0]    load: MovieLoadResponse  -> links: 5  (240p/360p/480p MP4s)
+[HentaiCity] load: MovieLoadResponse  -> links: 2  (MP4 + HLS)
+[WatchHentai] load: TvSeriesLoadResponse -> links: 2 (localhost proxy + direct)
 ```
 
 ## Layout
 
 ```
-Animetail/src/main/kotlin/com/animetail/cs/
-  AnimetailPlugin.kt          plugin entry, registers 69 providers
+AIO-Hentai/src/main/kotlin/com/aiohentai/cs/
+  AIOHentaiPlugin.kt          plugin entry, registers 69 providers
   compat/                     Aniyomi-API compatibility layer
   sites/<site>/<Source>.kt    the ported scraper (unchanged site logic)
   sites/<site>/<Source>Provider.kt

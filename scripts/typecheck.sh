@@ -9,8 +9,8 @@ STUB_SRC="/data/data/com.termux/files/usr/tmp/opencode/android-stub"
 STUB_JAR="$CACHE/android-stub.jar"
 
 if [ ! -f "$CACHE/cloudstream-classes.jar" ]; then
-  echo "missing $CACHE/cloudstream-classes.jar" >&2
-  exit 1
+  echo "downloading test environment into $CACHE"
+  "$(dirname "$0")/setup_env.sh"
 fi
 
 if [ ! -f "$STUB_JAR" ] || [ -n "$(find "$STUB_SRC" -newer "$STUB_JAR" -name '*.java' 2>/dev/null)" ]; then
@@ -23,7 +23,7 @@ fi
 CP="$CACHE/cloudstream-classes.jar:$STUB_JAR"
 for jar in "$CACHE"/libs/*.jar; do CP="$CP:$jar"; done
 
-SRC="$ROOT/Animetail/src/main/kotlin"
+SRC="$ROOT/AIO-Hentai/src/main/kotlin"
 OUT="$CACHE/typecheck-out"
 LOG="$CACHE/typecheck.log"
 rm -rf "$OUT"

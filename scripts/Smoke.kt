@@ -1,7 +1,7 @@
-package com.animetail.cs.smoke
+package com.aiohentai.cs.smoke
 
-import com.animetail.cs.compat.AnimeFilterList
-import com.animetail.cs.compat.AnimeHttpSource
+import com.aiohentai.cs.compat.AnimeFilterList
+import com.aiohentai.cs.compat.AnimeHttpSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll

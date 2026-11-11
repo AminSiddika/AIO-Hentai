@@ -27,4 +27,4 @@ mkdir -p "$CACHE/smoke-out"
 kotlinc -nowarn -jvm-target 1.8 -classpath "$CP" -d "$CACHE/smoke-out" \
   "$ROOT"/scripts/Smoke.kt "$ROOT"/scripts/SmokeSites.kt 2>&1 | grep -v "^warning:" || true
 
-java -cp "$CACHE/smoke-out:$CP" com.animetail.cs.smoke.SmokeKt "$@"
+java -cp "$CACHE/smoke-out:$CP" com.aiohentai.cs.smoke.SmokeKt "$@"
