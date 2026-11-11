@@ -76,20 +76,22 @@
 
 ## Site status
 
-Checked from a clean client on 2026-11-11. 63 of 69 sources returned a home page,
-details and episodes; the rest:
+Verified from a clean client on 2026-11-11 with `scripts/smoke.sh` (home page -> details ->
+episodes) and `scripts/provider_smoke.sh` (adapter -> links).
+
+**65 of 69 passed** in the full sweep. Per-site notes:
 
 | Source | Status |
 |---|---|
-| AnimeIDHentai | payload is now JSON-escaped in the page; fixed in this port |
-| Hentai.TV | same escaping fix as AnimeIDHentai |
+| AnimeIDHentai | payload is now JSON-escaped in the page; fixed in this port (60 items) |
+| Hentai.TV | same escaping fix (57 items) |
 | Hentaigasm | `hentaigasm.com` does not resolve — dead until the domain moves |
-| HentaiCloud | `www.hentaicloud.com` is dead; `https://hentaicloud.com` answers 200 |
-| Hentai0 | AJAX + XSRF flow; slow in the test run, browse may need the site's cookies |
-| UnderHentai | Cloudflare answers 403 to non-browser clients |
+| HentaiCloud | `www.hentaicloud.com` is unreachable from here; the apex redirects to it |
+| NsfwR34 | `nsfwr34.com` answered HTTP 522 (origin down) during the run; passed earlier |
+| HentaiStream | read timeout in the full sweep, passed on retry |
 
 Cloudflare-fronted sites (`muchohentai.com`, `ohentai.org`, `hanime.tv`, `hentaiking.com`,
-`underhentai.net`) can show a challenge on the first request.
+`underhentai.net`) can show a challenge or be slow on the first request.
 
-Use the provider's URL override in CloudStream settings to point a source at a new domain
-without waiting for a plugin update.
+Any provider's URL can be overridden in CloudStream's provider settings, so a moved domain
+does not need a plugin release.
