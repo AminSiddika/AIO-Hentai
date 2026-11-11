@@ -1,8 +1,8 @@
 # AIO-Hentai (CloudStream)
 
-A CloudStream 4 plugin with 68 adult sources. Most scrapers are ported from the
+A CloudStream 4 plugin with 73 adult sources. Most scrapers are ported from the
 [Animetail Aniyomi extension suite](https://github.com/AminSiddika/animetail-extensions);
-MissAV, SupJav, SexTB and JavGG are native additions. One `.cs3`, one install, 68 sources.
+MissAV, SupJav, SexTB, JavGG, 91Porn, AsianViral, JavTsunami, Manko and AVPorner are native additions. One `.cs3`, one install, 73 sources.
 
 All sources are adult (NSFW) English video sites.
 
@@ -54,7 +54,7 @@ local NanoHTTPD proxies stay exactly as they were debugged in the Aniyomi extens
 ### Differences from the Aniyomi build
 
 - `MediaVideo.referer` was a global per-APK; here each provider sets it before parsing
-  videos, so 68 sources in one plugin do not leak referers into each other.
+  videos, so 73 sources in one plugin do not leak referers into each other.
 - Only WatchHentai starts a localhost NanoHTTPD proxy for range requests; that still works
   because the plugin runs inside the CloudStream process.
 - Chromecast support is disabled per provider, since localhost proxy links cannot be cast.
@@ -70,9 +70,12 @@ Generated from `AIO-Hentai/src/main/kotlin/com/aiohentai/cs/sites` — see
 v3 removed five providers with no working playback path: H-Anime, Hentai-JP,
 HentaiCloud, Hentaigasm and UnderHentai. `SOURCES.md` records why.
 
-v4-v7 add the JAV sources **MissAV** (`missav.ws`), **SupJav** (`supjav.com`),
-**SexTB** (`sextb.net`) and **JavGG** (`javgg.net`), and move **JavGuru** into the same
-group. AvJiali was skipped because its public pages are trailer-only/paywalled. All five are typed
+v4-v8 add the JAV sources **MissAV** (`missav.ws`), **SupJav** (`supjav.com`),
+**SexTB** (`sextb.net`), **JavGG** (`javgg.net`), **91Porn** (`91porn.com`),
+**AsianViral** (`asianviral.net`), **JavTsunami** (`javtsunami.com`),
+**Manko** (`manko.fun`) and **AVPorner** (`avporner.com`), and move **JavGuru** into the
+same group. AvJiali and herexxx were skipped as paywalled; Ikisoda was skipped because its
+public file URLs return 404. All ten are typed
 `TvType.NSFW`/`Movie`, so they stay out of the Anime list. The new sites are
 Cloudflare-fronted; open them once in CloudStream's browser so `CloudflareKiller` can
 obtain clearance.
@@ -111,7 +114,7 @@ git push -u origin builds
 `~/.cache/cs3`, so everything below runs on a plain JVM — no Android SDK, no device.
 
 ```bash
-./scripts/typecheck.sh                        # all 145 files against the real CS API
+./scripts/typecheck.sh                        # all 155 files against the real CS API
 ./scripts/smoke.sh WatchHentai HentaiCity     # scraper level: home, details, episodes
 ./scripts/smoke.sh --links HentaiCity         # also resolve video links
 ./scripts/provider_smoke.sh WatchHentai       # adapter level: getMainPage/search/load/loadLinks
@@ -129,7 +132,7 @@ What the adapter test proves end to end (WatchHentai, HentaiCity, Hentai0):
 
 ```
 AIO-Hentai/src/main/kotlin/com/aiohentai/cs/
-  AIOHentaiPlugin.kt          plugin entry, registers 68 providers
+  AIOHentaiPlugin.kt          plugin entry, registers 73 providers
   compat/                     Aniyomi-API compatibility layer
   sites/<site>/<Source>.kt    the ported scraper (unchanged site logic)
   sites/<site>/<Source>Provider.kt

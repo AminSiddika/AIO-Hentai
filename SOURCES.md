@@ -1,6 +1,6 @@
 # Sources
 
-**68 providers** in plugin **v7**. Most are ported from the Aniyomi suite
+**73 providers** in plugin **v8**. Most are ported from the Aniyomi suite
 [`AminSiddika/animetail-extensions`](https://github.com/AminSiddika/animetail-extensions);
 MissAV, SupJav and SexTB were written for this plugin.
 Browse names keep the upstream `@JalebiBae - ` prefix, omitted here for readability.
@@ -56,7 +56,9 @@ Every active source implements a latest section and is overridable in CloudStrea
 | Hentaverse | `Hentaverse` | `hentaverse` | https://hentaverse.com | — |
 | HStream | `HStream` | `hstream` | https://hstream.moe | — |
 | Jav.Guru | `JavGuru` | `javguru` | https://jav.guru | 7 |
+| JAVTsunami | `Javtsunami` | `javtsunami` | https://javtsunami.com | — |
 | JavGG | `Javgg` | `javgg` | https://javgg.net | 5 |
+| Manko | `Manko` | `manko` | https://manko.fun | — |
 | MioHentai | `MioHentai` | `miohentai` | https://miohentai.com | 6 |
 | MissAV | `Missav` | `missav` | https://missav.ws | 8 |
 | MuchoHentai | `MuchoHentai` | `muchohentai` | https://muchohentai.com | — |
@@ -75,6 +77,9 @@ Every active source implements a latest section and is overridable in CloudStrea
 | SupJav | `Supjav` | `supjav` | https://supjav.com | 6 |
 | The JOI Database | `TheJoiDatabase` | `thejoidatabase` | https://www.the-joi-database.com | — |
 | 3DHentai | `ThreeDHentai` | `threehentai` | https://3dhentai.it.com | — |
+| 91Porn | `P91` | `p91` | https://www.91porn.com | — |
+| AsianViral | `Asianviral` | `asianviral` | https://asianviral.net | — |
+| AVPorner | `Avporner` | `avporner` | https://avporner.com | — |
 | UncensoredHentai | `UncensoredHentai` | `uncensoredhentai` | https://uncensoredhentai.xxx | 8 |
 | WatchAnimeHentai | `WatchAnimeHentai` | `watchanimehentai` | https://www.watchanimehentai.com | 1 |
 | Watch Hentai | `WatchHentai` | `watchhentai` | https://watchhentai.net | 8 |
@@ -141,12 +146,15 @@ These providers were deleted from the plugin because they had no working playbac
 
 ## Site status
 
-MissAV, SupJav, SexTB and JavGG are the v4-v7 JAV additions and are not in the v3 sweep below.
+MissAV, SupJav, SexTB and JavGG are the v4-v8 JAV additions and are not in the v3 sweep below.
 JavGuru was moved to the same NSFW/JAV type in v5. It sits behind a
 Cloudflare managed challenge: the provider uses CloudStream's `CloudflareKiller` in-app.
-MissAV, SupJav, SexTB and JavGG are Cloudflare-fronted and use `CloudflareKiller` in-app.
+MissAV, SupJav, SexTB, JavGG, AsianViral, JavTsunami, Manko and AVPorner are
+Cloudflare-fronted and use `CloudflareKiller` in-app.
 JavGG was verified live: home 40, search 6, load + 1 HLS, and five tag rows returning 40 each.
-AvJiali was checked and skipped: it is a paid site whose public pages expose only trailer MP4s.
+v8 adds 91Porn, AsianViral, JavTsunami, Manko and AVPorner. Manko's encrypted API was
+reversed (base-91 decoder -> JSON -> `wasabi_url_1`/`missav_video` HLS). AvJiali and
+herexxx were skipped as paywalled; Ikisoda was skipped because its public file URLs 404.
 SupJav's player chain was verified end to end from a saved detail page (HLS master
 returned 200). SexTB's AJAX player (`/ajax/player` + XOR) and direct-MP4 fallback were
 verified live (HLS returned 200). MissAV's packed player was verified from live HTML.

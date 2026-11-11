@@ -1,18 +1,17 @@
 # AIO-Hentai — Engineering Handoff
 
-Published: **v6** (`be1fe2d`); current working tree: **v7** (thumbnail fix, not pushed).
+Published: **v7** (`70600d7`); current working tree: **v8** (not pushed).
 Upstream: <https://github.com/AminSiddika/AIO-Hentai>
 
-A CloudStream 4 plugin that ships **68 adult (NSFW) video providers** in one `.cs3`.
+A CloudStream 4 plugin that ships **73 adult (NSFW) video providers** in one `.cs3`.
 Most scrapers are ported from the Aniyomi suite
 [`AminSiddika/animetail-extensions`](https://github.com/AminSiddika/animetail-extensions);
 MissAV, SupJav and SexTB are native scrapers. The rest is a small compatibility layer
 plus one adapter per source.
 
 > **Publishing note:** v3 is live on `builds` (`plugins.json` version `3`, 249,721-byte
-> `.cs3`). v6 added MissAV, SupJav, SexTB and JavGG. The v7 tree only fixes lazy
-> thumbnails (SexTB `data-src`, SupJav `data-original`); its local build is 271,295 bytes
-> and has not been pushed yet.
+> `.cs3`). v7 fixed lazy thumbnails. v8 adds 91Porn, AsianViral, JavTsunami, Manko and
+> AVPorner; its local build is 287,238 bytes and has not been pushed yet.
 
 ---
 
@@ -20,16 +19,16 @@ plus one adapter per source.
 
 | Item | Value |
 |---|---|
-| Plugin version | `7` (`AIO-Hentai/build.gradle.kts`) |
-| Providers registered | 68 |
-| Kotlin files | 145 (68 scrapers + 68 provider wrappers + 8 compat + 1 plugin) |
+| Plugin version | `8` (`AIO-Hentai/build.gradle.kts`) |
+| Providers registered | 73 |
+| Kotlin files | 155 (73 scrapers + 73 provider wrappers + 8 compat + 1 plugin) |
 | Genre rows | 37 sites, 184 verified rows |
-| JAV/NSFW sources | MissAV, SupJav, SexTB, JavGG, JavGuru (`TvType.NSFW`) |
+| JAV/NSFW sources | MissAV, SupJav, SexTB, JavGG, JavGuru, 91Porn, AsianViral, JavTsunami, Manko, AVPorner (`TvType.NSFW`) |
 | Removed in v3 | H-Anime, Hentai-JP, HentaiCloud, Hentaigasm, UnderHentai |
 | v3 sweep | 62/64 passed end to end; EroticHentai and XAnimePorn pass on retry |
-| v7 check | typecheck + clean build pass; SexTB/SupJav thumbnails now resolve to real image URLs |
+| v8 check | typecheck + clean build pass; P91, AsianViral, JavTsunami and Manko verified live; AVPorner parser verified (CF blocks plain JVM) |
 | Published artifact | `builds`: v3, 249,721-byte `.cs3`, hash `sha256-b687eb44…b2d583` |
-| Local build | **success** — 265 KB `.cs3` (271,295 bytes), zero compiler warnings |
+| Local build | **success** — 281 KB `.cs3` (287,238 bytes), zero compiler warnings |
 | Local build requirement | JDK 17+ and Android SDK 36 |
 | Test requirement | JDK + `kotlinc` + network; **no** Android SDK |
 
@@ -273,6 +272,27 @@ AvJiali was checked and **not added**: its public pages expose only paid-trailer
 
 ---
 
+### 3.10 v8 batch
+
+- **91Porn**: `index.php` listing, `view_video.php` details; the real `<source>` is
+  inside a comment and written with `strencode2("%3c...")`, so the parser percent-decodes
+  that payload. Verified 1 MP4.
+- **AsianViral**: `article.loop-video`, search `?s=`, PlayMogo iframe resolved via
+  `pass_md5` + token. Verified 1 MP4.
+- **JavTsunami**: `article.video-card`; `data-server-token` POSTed to
+  `/wp-json/jw-dom-tabs/v1/resolve`, then the returned player's packed JS expands to
+  hls4/hls2. Verified 1 HLS.
+- **Manko**: SPA + `healertanker.com` API. The API `data` field is a custom base-91
+  packer; decoding it yields list/detail JSON. Detail exposes `wasabi_url_1` and
+  `missav_video`. Verified 2 HLS links.
+- **AVPorner**: `.video-list` cards; detail `jwplayer_config` exposes MP4 sources with
+  labels. Parser verified with a fixture; live listing needs Cloudflare clearance.
+
+Skipped: **AvJiali** (paywall/trailers), **herexxx** (embed says video not allowed),
+**Ikisoda** (public file URLs 404; player iframe absent from server HTML).
+
+---
+
 ## 4. Sources removed in v3
 
 Deleted directories, registrations and genre rows:
@@ -400,6 +420,16 @@ v6 JavGG check:
 [Javgg] genres: English Subtitle 40, Uncensored Leak 40, Reduce Mosaic 40, Censored 40, Chinese Subtitle 40
 ```
 
+v8 checks:
+
+```
+[P91]         home 24, search 24, links 1 MP4
+[Asianviral]  home 30, search 2, links 1 MP4
+[Javtsunami]  home 32, search 1, links 1 HLS
+[Manko]       home 24, search 1, links 2 HLS
+[Avporner]    parser fixture -> 2 MP4s; plain JVM home empty (Cloudflare)
+```
+
 Canonical adapter check:
 
 ```
@@ -426,6 +456,10 @@ Canonical adapter check:
 | SexTB | player is an AJAX + XOR response; direct-MP4 fallback covers entries without it |
 | JavGG | Cloudflare on the listing/detail host; f4jav + VidHide player hosts work from the JVM |
 | AvJiali | not added: paywalled, only trailer MP4s are public |
+| 91Porn | real source is percent-encoded inside a comment; handled by `strencode2` decode |
+| Manko | encrypted API; decoder ported from build.js |
+| AVPorner | Cloudflare on listing/detail; parser verified, needs in-app clearance |
+| herexxx / Ikisoda | skipped: paywalled / public file URLs return 404 |
 
 Aki-H was confirmed in v3: home filters `/custom-udon/`, load returns 20 episodes and
 3 HLS renditions. AnimeIDHentai/Hentai.TV unescape fixes remain local to this port.
@@ -434,9 +468,9 @@ Aki-H was confirmed in v3: home filters `/custom-udon/`, load returns 20 episode
 
 ## 9. Open items
 
-1. v6 is live; v7 is local only. Commit/push v7 after the thumbnail check.
-2. Confirm MissAV, SupJav, SexTB and JavGG in the app: open each once in CloudStream's
-   browser, then play a title and check the NSFW/JAV section (not Anime).
+1. v7 is live; v8 is local only. Commit/push v8 after the new-source device checks.
+2. Confirm MissAV, SupJav, SexTB, JavGG, 91Porn, AsianViral, JavTsunami, Manko and
+   AVPorner in the app (NSFW/JAV section, not Anime).
 3. Confirm JavGuru now appears only in NSFW/JAV, not Anime.
 4. Confirm Aki-H, Hentai2w, Hentaverse and EroticHentai playback on a device.
 5. Re-run `provider_smoke.sh --genres` after the next network change; add rows only when
@@ -472,8 +506,8 @@ Aki-H was confirmed in v3: home filters `/custom-udon/`, load returns 20 episode
 ## 11. Quick verification
 
 ```bash
-grep -c 'registerMainAPI' AIO-Hentai/src/main/kotlin/com/aiohentai/cs/AIOHentaiPlugin.kt   # 68
-find AIO-Hentai/src -name '*.kt' | wc -l                                                  # 145
+grep -c 'registerMainAPI' AIO-Hentai/src/main/kotlin/com/aiohentai/cs/AIOHentaiPlugin.kt   # 73
+find AIO-Hentai/src -name '*.kt' | wc -l                                                  # 155
 grep -c ' to listOf(' AIO-Hentai/src/main/kotlin/com/aiohentai/cs/compat/Genres.kt       # 37
 grep -o '" to "/' AIO-Hentai/src/main/kotlin/com/aiohentai/cs/compat/Genres.kt | wc -l    # 184
 ```

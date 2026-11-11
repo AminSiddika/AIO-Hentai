@@ -3,6 +3,11 @@ package com.aiohentai.cs
 import android.content.Context
 import com.aiohentai.cs.compat.AppContext
 import com.aiohentai.cs.sites.akih.AkiHProvider
+import com.aiohentai.cs.sites.asianviral.AsianviralProvider
+import com.aiohentai.cs.sites.avporner.AvpornerProvider
+import com.aiohentai.cs.sites.javtsunami.JavtsunamiProvider
+import com.aiohentai.cs.sites.manko.MankoProvider
+import com.aiohentai.cs.sites.p91.P91Provider
 import com.aiohentai.cs.sites.animeidhentai.AnimeIdHentaiProvider
 import com.aiohentai.cs.sites.animesex.AnimeSexProvider
 import com.aiohentai.cs.sites.cartoonporn.CartoonPornProvider
@@ -145,5 +150,10 @@ class AIOHentaiPlugin : Plugin() {
         registerMainAPI(CartoonPornProvider())
         registerMainAPI(JavGuruProvider())
         registerMainAPI(JavggProvider())
+        registerMainAPI(AsianviralProvider())
+        registerMainAPI(AvpornerProvider())
+        registerMainAPI(JavtsunamiProvider())
+        registerMainAPI(MankoProvider())
+        registerMainAPI(P91Provider())
     }
 }

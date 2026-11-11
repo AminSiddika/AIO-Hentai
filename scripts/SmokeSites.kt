@@ -4,6 +4,8 @@ import com.aiohentai.cs.compat.AnimeHttpSource
 import com.aiohentai.cs.sites.akih.AkiH
 import com.aiohentai.cs.sites.animeidhentai.AnimeIdHentai
 import com.aiohentai.cs.sites.animesex.AnimeSex
+import com.aiohentai.cs.sites.asianviral.Asianviral
+import com.aiohentai.cs.sites.avporner.Avporner
 import com.aiohentai.cs.sites.cartoonporn.CartoonPorn
 import com.aiohentai.cs.sites.erotichentai.EroticHentai
 import com.aiohentai.cs.sites.hanimehentai.HanimeHentai
@@ -46,6 +48,8 @@ import com.aiohentai.cs.sites.hentaverse.Hentaverse
 import com.aiohentai.cs.sites.hstream.HStream
 import com.aiohentai.cs.sites.javgg.Javgg
 import com.aiohentai.cs.sites.javguru.JavGuru
+import com.aiohentai.cs.sites.javtsunami.Javtsunami
+import com.aiohentai.cs.sites.manko.Manko
 import com.aiohentai.cs.sites.miohentai.MioHentai
 import com.aiohentai.cs.sites.missav.Missav
 import com.aiohentai.cs.sites.muchohentai.MuchoHentai
@@ -56,6 +60,7 @@ import com.aiohentai.cs.sites.nsfwr34.NsfwR34
 import com.aiohentai.cs.sites.ohentai.Ohentai
 import com.aiohentai.cs.sites.okioto.Okioto
 import com.aiohentai.cs.sites.oppai.Oppai
+import com.aiohentai.cs.sites.p91.P91
 import com.aiohentai.cs.sites.r34tube.R34Tube
 import com.aiohentai.cs.sites.rule34paheal.Rule34Paheal
 import com.aiohentai.cs.sites.rule34s.Rule34s
@@ -75,6 +80,8 @@ fun smokeSites(): List<Pair<String, () -> AnimeHttpSource>> = listOf(
     "AkiH" to { AkiH() },
     "AnimeIdHentai" to { AnimeIdHentai() },
     "AnimeSex" to { AnimeSex() },
+    "Asianviral" to { Asianviral() },
+    "Avporner" to { Avporner() },
     "CartoonPorn" to { CartoonPorn() },
     "EroticHentai" to { EroticHentai() },
     "HanimeHentai" to { HanimeHentai() },
@@ -117,6 +124,8 @@ fun smokeSites(): List<Pair<String, () -> AnimeHttpSource>> = listOf(
     "HStream" to { HStream() },
     "Javgg" to { Javgg() },
     "JavGuru" to { JavGuru() },
+    "Javtsunami" to { Javtsunami() },
+    "Manko" to { Manko() },
     "MioHentai" to { MioHentai() },
     "Missav" to { Missav() },
     "MuchoHentai" to { MuchoHentai() },
@@ -127,6 +136,7 @@ fun smokeSites(): List<Pair<String, () -> AnimeHttpSource>> = listOf(
     "Ohentai" to { Ohentai() },
     "Okioto" to { Okioto() },
     "Oppai" to { Oppai() },
+    "P91" to { P91() },
     "R34Tube" to { R34Tube() },
     "Rule34Paheal" to { Rule34Paheal() },
     "Rule34s" to { Rule34s() },
