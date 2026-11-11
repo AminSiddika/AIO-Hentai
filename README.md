@@ -70,7 +70,7 @@ Generated from `AIO-Hentai/src/main/kotlin/com/aiohentai/cs/sites` — see
 v3 removed five providers with no working playback path: H-Anime, Hentai-JP,
 HentaiCloud, Hentaigasm and UnderHentai. `SOURCES.md` records why.
 
-v4-v6 add the JAV sources **MissAV** (`missav.ws`), **SupJav** (`supjav.com`),
+v4-v7 add the JAV sources **MissAV** (`missav.ws`), **SupJav** (`supjav.com`),
 **SexTB** (`sextb.net`) and **JavGG** (`javgg.net`), and move **JavGuru** into the same
 group. AvJiali was skipped because its public pages are trailer-only/paywalled. All five are typed
 `TvType.NSFW`/`Movie`, so they stay out of the Anime list. The new sites are

@@ -86,8 +86,12 @@ class Sextb : AnimeHttpSource() {
                     title = card.selectFirst(".tray-item-title")?.text()?.trim()
                         ?.takeIf { it.isNotBlank() }
                         ?: link.attr("title").trim()
-                    thumbnail_url = card.selectFirst("img.tray-item-thumbnail")?.absUrl("src")
-                        ?: card.selectFirst("img")?.absUrl("src")
+                    thumbnail_url = card.selectFirst("img.tray-item-thumbnail")?.let { image ->
+                        image.absUrl("data-src").ifBlank { image.absUrl("src") }
+                    }?.takeIf { it.isNotBlank() }
+                        ?: card.selectFirst("img")?.let { image ->
+                            image.absUrl("data-src").ifBlank { image.absUrl("src") }
+                        }?.takeIf { it.isNotBlank() }
                 }
             }
             .distinctBy { it.url }

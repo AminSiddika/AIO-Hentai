@@ -1,6 +1,6 @@
 # AIO-Hentai — Engineering Handoff
 
-Published: **v3**; current working tree: **v6** (not pushed yet). Base: `a9f3d34`.
+Published: **v6** (`be1fe2d`); current working tree: **v7** (thumbnail fix, not pushed).
 Upstream: <https://github.com/AminSiddika/AIO-Hentai>
 
 A CloudStream 4 plugin that ships **68 adult (NSFW) video providers** in one `.cs3`.
@@ -10,9 +10,9 @@ MissAV, SupJav and SexTB are native scrapers. The rest is a small compatibility 
 plus one adapter per source.
 
 > **Publishing note:** v3 is live on `builds` (`plugins.json` version `3`, 249,721-byte
-> `.cs3`). The v6 tree adds MissAV, SupJav, SexTB and JavGG (and moves JavGuru to
-> NSFW); its local build is 270,870 bytes. Nothing has been committed or pushed since v3. Do not
-> publish until the on-device Cloudflare checks pass.
+> `.cs3`). v6 added MissAV, SupJav, SexTB and JavGG. The v7 tree only fixes lazy
+> thumbnails (SexTB `data-src`, SupJav `data-original`); its local build is 271,295 bytes
+> and has not been pushed yet.
 
 ---
 
@@ -20,16 +20,16 @@ plus one adapter per source.
 
 | Item | Value |
 |---|---|
-| Plugin version | `6` (`AIO-Hentai/build.gradle.kts`) |
+| Plugin version | `7` (`AIO-Hentai/build.gradle.kts`) |
 | Providers registered | 68 |
 | Kotlin files | 145 (68 scrapers + 68 provider wrappers + 8 compat + 1 plugin) |
 | Genre rows | 37 sites, 184 verified rows |
 | JAV/NSFW sources | MissAV, SupJav, SexTB, JavGG, JavGuru (`TvType.NSFW`) |
 | Removed in v3 | H-Anime, Hentai-JP, HentaiCloud, Hentaigasm, UnderHentai |
 | v3 sweep | 62/64 passed end to end; EroticHentai and XAnimePorn pass on retry |
-| v6 check | typecheck + clean build pass; JavGG + SexTB + SupJav players verified live; MissAV verified from live HTML |
+| v7 check | typecheck + clean build pass; SexTB/SupJav thumbnails now resolve to real image URLs |
 | Published artifact | `builds`: v3, 249,721-byte `.cs3`, hash `sha256-b687eb44…b2d583` |
-| Local build | **success** — 264 KB `.cs3` (270,870 bytes), zero compiler warnings |
+| Local build | **success** — 265 KB `.cs3` (271,295 bytes), zero compiler warnings |
 | Local build requirement | JDK 17+ and Android SDK 36 |
 | Test requirement | JDK + `kotlinc` + network; **no** Android SDK |
 
@@ -434,7 +434,7 @@ Aki-H was confirmed in v3: home filters `/custom-udon/`, load returns 20 episode
 
 ## 9. Open items
 
-1. v3 is live; v4-v6 are local only. Commit/push v6 after the JAV device checks pass.
+1. v6 is live; v7 is local only. Commit/push v7 after the thumbnail check.
 2. Confirm MissAV, SupJav, SexTB and JavGG in the app: open each once in CloudStream's
    browser, then play a title and check the NSFW/JAV section (not Anime).
 3. Confirm JavGuru now appears only in NSFW/JAV, not Anime.

@@ -1,6 +1,6 @@
 # Sources
 
-**68 providers** in plugin **v6**. Most are ported from the Aniyomi suite
+**68 providers** in plugin **v7**. Most are ported from the Aniyomi suite
 [`AminSiddika/animetail-extensions`](https://github.com/AminSiddika/animetail-extensions);
 MissAV, SupJav and SexTB were written for this plugin.
 Browse names keep the upstream `@JalebiBae - ` prefix, omitted here for readability.
@@ -141,7 +141,7 @@ These providers were deleted from the plugin because they had no working playbac
 
 ## Site status
 
-MissAV, SupJav, SexTB and JavGG are the v4-v6 JAV additions and are not in the v3 sweep below.
+MissAV, SupJav, SexTB and JavGG are the v4-v7 JAV additions and are not in the v3 sweep below.
 JavGuru was moved to the same NSFW/JAV type in v5. It sits behind a
 Cloudflare managed challenge: the provider uses CloudStream's `CloudflareKiller` in-app.
 MissAV, SupJav, SexTB and JavGG are Cloudflare-fronted and use `CloudflareKiller` in-app.

@@ -86,7 +86,8 @@ class Supjav : AnimeHttpSource() {
                     setUrlWithoutDomain(href)
                     title = link.text().trim().ifBlank { link.attr("title").trim() }
                     thumbnail_url = image?.absUrl("data-src")?.takeIf { it.isNotBlank() }
-                        ?: image?.absUrl("src")
+                        ?: image?.absUrl("data-original")?.takeIf { it.isNotBlank() }
+                        ?: image?.absUrl("src")?.takeIf { it.isNotBlank() }
                 }
             }
             .distinctBy { it.url }
