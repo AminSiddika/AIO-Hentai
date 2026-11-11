@@ -1,6 +1,6 @@
 # AIO-Hentai — Engineering Handoff
 
-Snapshot: **v3 working tree**, based on upstream commit `75d07d3`.
+Published: **v3**, 2026-11-11. Source: `a9f3d34` on `main`, based on upstream `75d07d3`.
 Upstream: <https://github.com/AminSiddika/AIO-Hentai>
 
 A CloudStream 4 plugin that ships **64 adult (NSFW) video providers** in one `.cs3`.
@@ -8,9 +8,9 @@ The scrapers are ported from the Aniyomi suite
 [`AminSiddika/animetail-extensions`](https://github.com/AminSiddika/animetail-extensions);
 the only new code is a small compatibility layer plus one adapter per source.
 
-> **Publishing note:** `main`/`builds` still serve **v2** (69 sources). This working tree
-> is **v3** (64 sources) and has not been pushed. CI will publish v3 after the version
-> bump and push are committed.
+> **Publishing note:** CI run `43031074544` succeeded and pushed the v3 artifact to
+> `builds` (`plugins.json` version `3`, 249,721-byte `.cs3`). Users get it on the next
+> repository refresh.
 
 ---
 
@@ -24,6 +24,7 @@ the only new code is a small compatibility layer plus one adapter per source.
 | Genre rows | 33 sites, 162 verified rows |
 | Removed in v3 | H-Anime, Hentai-JP, HentaiCloud, Hentaigasm, UnderHentai |
 | Final sweep | 62/64 passed end to end; 2 slow/throttled (EroticHentai, XAnimePorn), both pass on retry |
+| Published artifact | `builds`: v3, 249,721-byte `.cs3`, hash `sha256-b687eb44…b2d583` |
 | Local build | **success** — 244 KB `.cs3` (249,721 bytes), zero compiler warnings |
 | Local build requirement | JDK 17+ and Android SDK 36 |
 | Test requirement | JDK + `kotlinc` + network; **no** Android SDK |
@@ -317,8 +318,8 @@ Aki-H was confirmed in v3: home filters `/custom-udon/`, load returns 20 episode
 
 ## 9. Open items
 
-1. Commit and push v3; confirm CI publishes `"version": 3` to `builds/plugins.json`
-   (the local build already produces a 249,721-byte `.cs3` with the expected hash).
+1. CI is green and `builds/plugins.json` reports `"version": 3`; re-check after any
+   future push.
 2. Confirm Aki-H, Hentai2w, Hentaverse and EroticHentai playback on a device.
 3. Re-run `provider_smoke.sh --genres` after the next network change; add rows only when
    a listing returns items.
