@@ -47,6 +47,9 @@ class R34Tube : AnimeHttpSource() {
     private fun parseList(response: Response): AnimesPage {
         val doc = response.asJsoup()
         val items = doc.select("a[href^='/v/']")
+            // Search pages also render a text-only hero result (links but no poster);
+            // skipping image-less anchors stops it from masking the grid cards.
+            .filter { it.selectFirst("img") != null }
             .mapNotNull { link ->
                 val href = link.absUrl("href").ifBlank { link.attr("href") }
                 if (!VIDEO_URL.matches(href)) return@mapNotNull null

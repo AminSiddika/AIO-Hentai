@@ -69,8 +69,14 @@ class Javtsunami : AnimeHttpSource() {
                     title = card.selectFirst(".card-title a")?.text()?.trim()
                         ?.takeIf { it.isNotBlank() }
                         ?: image?.attr("alt")?.trim().orEmpty()
-                    thumbnail_url = image?.absUrl("data-src")?.takeIf { it.isNotBlank() }
-                        ?: image?.absUrl("src")
+                    // Some cards lazy-load through different attributes than data-src.
+                    thumbnail_url = listOf("data-src", "data-lazy-src", "data-original", "data-rd-src")
+                        .firstNotNullOfOrNull { attr ->
+                            image?.absUrl(attr)?.takeIf { it.startsWith("http") }
+                        }
+                        ?: image?.absUrl("src")?.takeIf { it.startsWith("http") }
+                        ?: image?.attr("srcset")?.substringBefore(' ')?.trim()
+                            ?.takeIf { it.startsWith("http") }
                 }
             }
             .distinctBy { it.url }

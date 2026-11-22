@@ -59,6 +59,7 @@ class HentaiHavenXxx : AnimeHttpSource() {
             doc.select("a[href*='/rule34/video/']")
         }
         val items = links
+            .filter { it.selectFirst("img") != null }
             .mapNotNull { link ->
                 val href = link.absUrl("href").ifBlank { link.attr("href") }
                 if (!SERIES_URL.matches(href) && !VIDEO_URL.matches(href)) return@mapNotNull null

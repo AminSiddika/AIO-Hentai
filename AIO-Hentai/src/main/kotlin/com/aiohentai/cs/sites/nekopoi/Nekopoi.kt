@@ -56,11 +56,22 @@ class Nekopoi : AnimeHttpSource() {
             val href = link.absUrl("href").ifBlank { link.attr("href") }
             if (!SERIES_URL.matches(href) && !EPISODE_POST.matches(href)) return@mapNotNull null
             val tooltip = link.attr("original-title")
-            val thumb = if (tooltip.isNotBlank()) {
-                Jsoup.parse(tooltip).selectFirst("img")?.attr("src")?.takeIf { it.isNotBlank() }
+            val tooltipThumb = if (tooltip.isNotBlank()) {
+                Jsoup.parse(tooltip, "$baseUrl/").selectFirst("img")?.absUrl("src")
+                    ?.takeIf { it.isNotBlank() }
             } else {
-                link.selectFirst("img")?.absUrl("src")
+                null
             }
+            // Search results paint the poster as a background-image on .nk-search-thumb.
+            val backgroundThumb = link.selectFirst(".nk-search-thumb")
+                ?.attr("style")
+                ?.let { style ->
+                    Regex("""url\(['"]?([^'")]+)['"]?\)""").find(style)
+                        ?.groupValues?.get(1)
+                }
+            val thumb = tooltipThumb
+                ?: backgroundThumb
+                ?: link.selectFirst("img")?.absUrl("src")
             SAnime.create().apply {
                 setUrlWithoutDomain(href)
                 title = link.text().trim()

@@ -60,7 +60,11 @@ class Rule34Video : AnimeHttpSource() {
                 SAnime.create().apply {
                     setUrlWithoutDomain(href)
                     title = link.attr("title").ifBlank { img?.attr("alt").orEmpty() }.trim()
-                    thumbnail_url = img?.absUrl("src")
+                    // Most cards lazy-load: src holds a 1x1 gif and the real poster
+                    // lives in data-rd-src (336px) / data-rd-jpg (320px).
+                    thumbnail_url = img?.absUrl("data-rd-src")?.takeIf { it.isNotBlank() }
+                        ?: img?.absUrl("data-rd-jpg")?.takeIf { it.isNotBlank() }
+                        ?: img?.absUrl("src")?.takeIf { it.startsWith("http") }
                 }
             }
             .distinctBy { it.url }
@@ -78,6 +82,7 @@ class Rule34Video : AnimeHttpSource() {
         return SAnime.create().apply {
             title = doc.selectFirst("h1")?.text()?.trim().orEmpty()
             thumbnail_url = doc.selectFirst("meta[property=og:image]")?.attr("content")
+                ?: screenshotPoster(response.request.url.toString())
             genre = doc.select("a[href*='/tags/']")
                 .map { it.text().trim() }
                 .filter { it.isNotEmpty() }
@@ -87,6 +92,17 @@ class Rule34Video : AnimeHttpSource() {
             status = SAnime.COMPLETED
             initialized = true
         }
+    }
+
+    /**
+     * Detail pages carry no og:image. Reconstruct the poster from the video id, using
+     * the same screenshots bucket layout as the listing cards.
+     */
+    private fun screenshotPoster(pageUrl: String): String? {
+        val id = Regex("""/video/(\d+)/""").find(pageUrl)?.groupValues?.get(1)
+            ?.toLongOrNull() ?: return null
+        val bucket = (id / 1000) * 1000
+        return "$baseUrl/contents/videos_screenshots/$bucket/$id/336x189/1.jpg"
     }
 
     override fun episodeListParse(response: Response): List<SEpisode> = listOf(

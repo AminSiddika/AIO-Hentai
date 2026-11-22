@@ -48,15 +48,21 @@ class MundoHentai : AnimeHttpSource() {
 
     private fun parseList(response: Response): AnimesPage {
         val doc = response.asJsoup()
-        val items = doc.select("a[href^=/info/]")
-            .mapNotNull { link ->
+        // Each poster is a sibling of the /info/ links, not a child, so the old
+        // anchor-based pass always produced empty titles and thumbnails.
+        val items = doc.select("article.item")
+            .mapNotNull { card ->
+                val link = card.selectFirst("div.data h3 a[href*='/info/']")
+                    ?: card.selectFirst("a[href*='/info/']")
+                    ?: return@mapNotNull null
                 val href = link.absUrl("href").ifBlank { link.attr("href") }
                 if (!href.contains("/info/")) return@mapNotNull null
-                val img = link.selectFirst("img")
+                val img = card.selectFirst("div.poster img") ?: card.selectFirst("img")
                 SAnime.create().apply {
                     setUrlWithoutDomain(href)
-                    title = img?.attr("alt")?.trim()
-                        ?: link.attr("title").ifBlank { link.text() }.trim()
+                    title = link.attr("title").ifBlank { link.text() }.trim().ifBlank {
+                        img?.attr("alt")?.trim().orEmpty()
+                    }
                     thumbnail_url = img?.absUrl("data-src")?.takeIf { it.isNotBlank() }
                         ?: img?.absUrl("src")
                 }

@@ -71,7 +71,9 @@ class HStream : AnimeHttpSource() {
     }
 
     private fun parseCards(html: String): List<SAnime> {
-        val doc = org.jsoup.Jsoup.parse(html)
+        // Cards use root-relative cover paths (/images/...), so the document needs a
+        // base URI or every absUrl() call resolves to an empty string.
+        val doc = org.jsoup.Jsoup.parse(html, "$baseUrl/")
         return doc.select("a[href^=https://hstream.moe/hentai/]")
             .toList()
             .filter { it.selectFirst("img") != null }
@@ -82,7 +84,7 @@ class HStream : AnimeHttpSource() {
                 SAnime.create().apply {
                     setUrlWithoutDomain(href)
                     title = img?.attr("alt")?.trim().orEmpty()
-                    thumbnail_url = img?.absUrl("src")
+                    thumbnail_url = img?.absUrl("src")?.ifBlank { img.absUrl("data-src") }
                 }
             }
             .distinctBy { it.url }

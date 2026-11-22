@@ -58,7 +58,9 @@ class HentaistreamTv : AnimeHttpSource() {
                     title = img?.attr("alt")?.trim()?.takeIf { it.isNotBlank() }
                         ?: link.attr("title").trim().takeIf { it.isNotBlank() }
                         ?: link.text().trim()
-                    thumbnail_url = img?.absUrl("src")
+                    // Home cards lazy-load through data-src and keep a data: URI in src.
+                    thumbnail_url = img?.absUrl("data-src")?.takeIf { it.startsWith("http") }
+                        ?: img?.absUrl("src")?.takeIf { it.startsWith("http") }
                 }
             }
             .distinctBy { it.url }

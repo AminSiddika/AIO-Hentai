@@ -45,20 +45,26 @@ class Hentai222 : AnimeHttpSource() {
 
     private fun parseList(response: Response): AnimesPage {
         val doc = response.asJsoup()
-        val items = doc.select("a[href^='https://hentai222.com/video/']")
-            .mapNotNull { link ->
+        val items = doc.select("article.video-card")
+            .mapNotNull { card ->
+                val link = card.selectFirst("a.video-thumbnail[href]")
+                    ?: card.selectFirst("a[href*='/video/']")
+                    ?: return@mapNotNull null
                 val href = link.absUrl("href").ifBlank { link.attr("href") }
                 if (!VIDEO_URL.matches(href)) return@mapNotNull null
-                val img = link.selectFirst("img")
+                val img = card.selectFirst("img")
+                val poster = card.selectFirst("video[poster]")?.absUrl("poster")
                 val title = img?.attr("alt")?.trim()?.takeIf { it.isNotBlank() }
+                    ?: card.selectFirst("h2.video-title a")?.text()?.trim()?.takeIf { it.isNotBlank() }
                     ?: link.attr("title").trim().takeIf { it.isNotBlank() }
-                    ?: link.selectFirst("h3")?.text()?.trim()
+                    ?: link.attr("aria-label").trim().takeIf { it.isNotBlank() }
                     ?: link.text().trim()
                 SAnime.create().apply {
                     setUrlWithoutDomain(href)
                     this.title = title
                     thumbnail_url = img?.attr("data-src")?.takeIf { it.isNotBlank() }
-                        ?: img?.absUrl("src")
+                        ?: img?.absUrl("src")?.takeIf { it.startsWith("http") }
+                        ?: poster
                         ?: link.attr("data-bg").takeIf { it.isNotBlank() }
                 }
             }

@@ -46,6 +46,8 @@ class XAnimePorn : AnimeHttpSource() {
     private fun parseList(response: Response): AnimesPage {
         val doc = response.asJsoup()
         val items = doc.select("ul.listing-tube li")
+            // Widget lists also contain text-only "See all" links; keep real cards.
+            .filter { it.selectFirst("img") != null }
             .mapNotNull { item ->
                 val link = item.selectFirst("a[href][title]")
                     ?: item.selectFirst("a[href]")

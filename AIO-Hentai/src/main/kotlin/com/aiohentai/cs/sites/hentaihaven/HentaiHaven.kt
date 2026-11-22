@@ -14,9 +14,7 @@ import com.aiohentai.cs.compat.asJsoup
 import okhttp3.FormBody
 import okhttp3.Request
 import okhttp3.Response
-import org.json.JSONArray
 import org.json.JSONObject
-import org.jsoup.Jsoup
 import java.net.URLEncoder
 
 class HentaiHaven : AnimeHttpSource() {
@@ -40,33 +38,39 @@ class HentaiHaven : AnimeHttpSource() {
 
     override fun searchAnimeRequest(page: Int, query: String, filters: AnimeFilterList): Request {
         val encoded = URLEncoder.encode(query, "UTF-8")
-        return GET(
-            "$baseUrl/wp-json/wp/v2/search?search=$encoded&subtype=wp-manga&per_page=20&page=$page",
-            headers,
-        )
+        // The wp-json search endpoint has no cover field, so search through the HTML
+        // results page instead; those cards carry the same covers as the home rows.
+        val url = if (page <= 1) "$baseUrl/?s=$encoded" else "$baseUrl/page/$page/?s=$encoded"
+        return GET(url, headers)
     }
 
     override fun searchAnimeParse(response: Response): AnimesPage {
-        val body = response.body?.string().orEmpty()
-        val results = runCatching { JSONArray(body) }.getOrNull() ?: return AnimesPage(emptyList(), false)
-        val items = buildList {
-            for (i in 0 until results.length()) {
-                val obj = results.optJSONObject(i) ?: continue
-                val url = obj.optString("url")
-                if (!url.contains("/watch/")) continue
-                val title = Jsoup.parse(obj.optString("title")).text()
-                add(
-                    SAnime.create().apply {
-                        setUrlWithoutDomain(url)
-                        this.title = title
-                    },
-                )
+        val doc = response.asJsoup()
+        val items = doc.select("div.c-tabs-item__content, div.item-thumb")
+            .mapNotNull { card ->
+                val link = card.selectFirst("div.tab-thumb a[href*='/watch/']")
+                    ?: card.selectFirst("a[href*='/watch/']")
+                    ?: return@mapNotNull null
+                val href = link.absUrl("href").ifBlank { link.attr("href") }
+                if (href.isBlank()) return@mapNotNull null
+                SAnime.create().apply {
+                    setUrlWithoutDomain(href)
+                    title = card.selectFirst("h3 a")?.text()?.trim()
+                        ?.takeIf { it.isNotBlank() }
+                        ?: link.attr("title").trim().takeIf { it.isNotBlank() }
+                        ?: link.text().trim()
+                    thumbnail_url = (card.selectFirst("div.tab-thumb img") ?: card.selectFirst("img"))
+                        ?.let { img -> img.absUrl("data-src").ifBlank { img.absUrl("src") } }
+                }
             }
-        }
-        val current = Regex("[?&]page=(\\d+)").find(response.request.url.toString())
+            .distinctBy { it.url }
+        val current = Regex("/page/(\\d+)/").find(response.request.url.toString())
             ?.groupValues?.get(1)?.toIntOrNull() ?: 1
-        val total = response.header("X-WP-TotalPages")?.toIntOrNull()
-        return AnimesPage(items.distinctBy { it.url }, total != null && current < total)
+        val hasNext = doc.select("a[href]").any {
+            val href = it.attr("href")
+            href.contains("/page/${current + 1}/") && href.contains("s=")
+        }
+        return AnimesPage(items, hasNext)
     }
 
     private fun listUrl(page: Int): String =
