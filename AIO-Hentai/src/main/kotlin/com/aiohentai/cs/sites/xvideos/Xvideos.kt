@@ -5,6 +5,7 @@ import com.aiohentai.cs.compat.AnimeHttpSource
 import com.aiohentai.cs.compat.AnimesPage
 import com.aiohentai.cs.compat.GET
 import com.aiohentai.cs.compat.MediaVideo
+import com.aiohentai.cs.compat.MirrorPool
 import com.aiohentai.cs.compat.SAnime
 import com.aiohentai.cs.compat.SEpisode
 import com.aiohentai.cs.compat.Video
@@ -21,7 +22,13 @@ class Xvideos : AnimeHttpSource() {
 
     override val name = "@JalebiBae - XVideos"
     override val id: Long = 4781293405128734601L
-    override val baseUrl = "https://www.xvideos.com"
+    private val mirrors = MirrorPool(
+        primary = "https://www.xvideos.com",
+        alternates = listOf("https://www.xvideos2.com", "https://www.xvideos3.com"),
+        marker = "XVIDEOS.COM",
+    )
+    override val baseUrl: String
+        get() = mirrors.active
     override val lang = "en"
     override val supportsLatest = true
 
@@ -36,6 +43,7 @@ class Xvideos : AnimeHttpSource() {
     // ---------------------------------------------------------------- browse
 
     override fun popularAnimeRequest(page: Int): Request {
+        ensureBase()
         val url = if (page <= 1) {
             "$baseUrl/best"
         } else {
@@ -47,12 +55,15 @@ class Xvideos : AnimeHttpSource() {
 
     override fun popularAnimeParse(response: Response): AnimesPage = parseList(response)
 
-    override fun latestUpdatesRequest(page: Int): Request =
-        GET(if (page <= 1) "$baseUrl/" else "$baseUrl/new/${page - 1}", headers)
+    override fun latestUpdatesRequest(page: Int): Request {
+        ensureBase()
+        return GET(if (page <= 1) "$baseUrl/" else "$baseUrl/new/${page - 1}", headers)
+    }
 
     override fun latestUpdatesParse(response: Response): AnimesPage = parseList(response)
 
     override fun searchAnimeRequest(page: Int, query: String, filters: AnimeFilterList): Request {
+        ensureBase()
         val encoded = URLEncoder.encode(query, "UTF-8").replace("+", "%20")
         return GET("$baseUrl/?k=$encoded&p=${(page - 1).coerceAtLeast(0)}", headers)
     }
@@ -60,8 +71,13 @@ class Xvideos : AnimeHttpSource() {
     override fun searchAnimeParse(response: Response): AnimesPage = parseList(response)
 
     override fun genrePageUrl(path: String, page: Int): String {
+        ensureBase()
         val base = if (path.startsWith("/")) baseUrl.trimEnd('/') + path else path
         return if (page <= 1) base else "$base/${page - 1}"
+    }
+
+    private fun ensureBase() {
+        mirrors.base(client, headers)
     }
 
     private fun parseList(response: Response): AnimesPage {

@@ -57,7 +57,7 @@ class JavGuru : AnimeHttpSource() {
                     title = img?.attr("alt")?.trim()?.takeIf { it.isNotBlank() }
                         ?: link.attr("title").trim().takeIf { it.isNotBlank() }
                         ?: link.text().trim()
-                    thumbnail_url = img?.absUrl("src")
+                    thumbnail_url = thumb(img?.absUrl("src"))
                 }
             }
             .distinctBy { it.url }
@@ -74,9 +74,9 @@ class JavGuru : AnimeHttpSource() {
         val doc = response.asJsoup()
         return SAnime.create().apply {
             title = doc.selectFirst("h1")?.text()?.trim().orEmpty()
-            thumbnail_url = doc.selectFirst("meta[property=og:image]")?.attr("content")
-                ?: doc.selectFirst("meta[name=twitter:image]")?.attr("content")
-                ?: doc.selectFirst(".large-screenshot img, article img")?.absUrl("src")
+            thumbnail_url = thumb(doc.selectFirst("meta[property=og:image]")?.attr("content"))
+                ?: thumb(doc.selectFirst("meta[name=twitter:image]")?.attr("content"))
+                ?: thumb(doc.selectFirst(".large-screenshot img, article img")?.absUrl("src"))
             genre = doc.select("a[href*='/category/'], a[href*='/tag/'], a[href*='/actress/']")
                 .map { it.text().trim() }
                 .filter { it.isNotEmpty() }
@@ -87,6 +87,15 @@ class JavGuru : AnimeHttpSource() {
             initialized = true
         }
     }
+
+    /**
+     * cdn.javmiku.com answers image clients with a Cloudflare challenge; the same
+     * WordPress uploads are mirrored on cdn.javnorth.com, which serves them normally.
+     */
+    private fun thumb(url: String?): String? = url
+        ?.replace("https://cdn.javmiku.com", "https://cdn.javnorth.com")
+        ?.replace("http://cdn.javmiku.com", "https://cdn.javnorth.com")
+        ?.takeIf { it.isNotBlank() }
 
     override fun episodeListParse(response: Response): List<SEpisode> = listOf(
         SEpisode.create().apply {

@@ -1,6 +1,6 @@
 # AIO-Hentai — Engineering Handoff
 
-Published: **v10** (`30fe299`); current working tree: **v11** (not pushed).
+Published: **v11** (`05ce16b`); current working tree: **v12** (not pushed).
 Upstream: <https://github.com/AminSiddika/AIO-Hentai>
 
 A CloudStream 4 plugin that ships **78 adult (NSFW) video providers** in one `.cs3`.
@@ -13,7 +13,7 @@ plus one adapter per source.
 > `.cs3`). v8 added 91Porn, AsianViral, JavTsunami, Manko and AVPorner. v9 fixed
 > 91Porn's full listing and AVPorner's Popular + 8 category rows. v10 fixed missing
 > thumbnails across 11 providers. v11 adds XVideos, XNXX, xHamster, SpankBang and
-> TNAFlix with 12 category rows each.
+> TNAFlix with A-Z category rows. v12 adds A-Z rows for those five, regional mirror fallback (xvideos2/3, xnxx2/3/tv/xxx, spankbang.party), a JavGuru poster mirror and working AvPorner category rows.
 
 ---
 
@@ -21,15 +21,15 @@ plus one adapter per source.
 
 | Item | Value |
 |---|---|
-| Plugin version | `11` (`AIO-Hentai/build.gradle.kts`) |
+| Plugin version | `12` (`AIO-Hentai/build.gradle.kts`) |
 | Providers registered | 78 |
 | Kotlin files | 165 (78 scrapers + 78 provider wrappers + 8 compat + 1 plugin) |
-| Genre rows | 43 sites, 252 rows |
+| Genre rows | 43 sites, 320 rows |
 | JAV/NSFW sources | MissAV, SupJav, SexTB, JavGG, JavGuru, 91Porn, AsianViral, JavTsunami, Manko, AVPorner (`TvType.NSFW`) |
 | Removed in v3 | H-Anime, Hentai-JP, HentaiCloud, Hentaigasm, UnderHentai |
 | v3 sweep | 62/64 passed end to end; EroticHentai and XAnimePorn pass on retry |
-| v11 check | XVideos/XNXX/xHamster/TNAFlix category rows return items; SpankBang category rows await a Cloudflare-capable run |
-| Published artifact | `builds`: v10 |
+| v11 check | 98 A-Z rows verified for XVideos/XNXX/xHamster/TNAFlix; SpankBang rows await a Cloudflare-capable run |
+| Published artifact | `builds`: v11 |
 | Local build | **success** — v9 281 KB `.cs3` (287,604 bytes), zero compiler warnings |
 | Local build requirement | JDK 17+ and Android SDK 36 |
 | Test requirement | JDK + `kotlinc` + network; **no** Android SDK |

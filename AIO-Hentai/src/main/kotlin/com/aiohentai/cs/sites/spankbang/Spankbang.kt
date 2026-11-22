@@ -5,6 +5,7 @@ import com.aiohentai.cs.compat.AnimeHttpSource
 import com.aiohentai.cs.compat.AnimesPage
 import com.aiohentai.cs.compat.GET
 import com.aiohentai.cs.compat.MediaVideo
+import com.aiohentai.cs.compat.MirrorPool
 import com.aiohentai.cs.compat.SAnime
 import com.aiohentai.cs.compat.SEpisode
 import com.aiohentai.cs.compat.Video
@@ -24,7 +25,13 @@ class Spankbang : AnimeHttpSource() {
 
     override val name = "@JalebiBae - SpankBang"
     override val id: Long = 1866139741386437001L
-    override val baseUrl = "https://spankbang.com"
+    private val mirrors = MirrorPool(
+        primary = "https://spankbang.com",
+        alternates = listOf("https://spankbang.party"),
+        marker = "SpankBang",
+    )
+    override val baseUrl: String
+        get() = mirrors.active
     override val lang = "en"
     override val supportsLatest = true
 
@@ -37,17 +44,22 @@ class Spankbang : AnimeHttpSource() {
 
     // ---------------------------------------------------------------- browse
 
-    override fun popularAnimeRequest(page: Int): Request =
-        GET(if (page <= 1) "$baseUrl/trending_videos/" else "$baseUrl/trending_videos/$page/", headers)
+    override fun popularAnimeRequest(page: Int): Request {
+        ensureBase()
+        return GET(if (page <= 1) "$baseUrl/trending_videos/" else "$baseUrl/trending_videos/$page/", headers)
+    }
 
     override fun popularAnimeParse(response: Response): AnimesPage = parseList(response)
 
-    override fun latestUpdatesRequest(page: Int): Request =
-        GET(if (page <= 1) "$baseUrl/new_videos/" else "$baseUrl/new_videos/$page/", headers)
+    override fun latestUpdatesRequest(page: Int): Request {
+        ensureBase()
+        return GET(if (page <= 1) "$baseUrl/new_videos/" else "$baseUrl/new_videos/$page/", headers)
+    }
 
     override fun latestUpdatesParse(response: Response): AnimesPage = parseList(response)
 
     override fun searchAnimeRequest(page: Int, query: String, filters: AnimeFilterList): Request {
+        ensureBase()
         val encoded = URLEncoder.encode(query, "UTF-8").replace("+", "%20")
         val url = if (page <= 1) "$baseUrl/s/$encoded/" else "$baseUrl/s/$encoded/$page/"
         return GET(url, headers)
@@ -56,8 +68,13 @@ class Spankbang : AnimeHttpSource() {
     override fun searchAnimeParse(response: Response): AnimesPage = parseList(response)
 
     override fun genrePageUrl(path: String, page: Int): String {
+        ensureBase()
         val base = if (path.startsWith("/")) baseUrl.trimEnd('/') + path else path
-        return if (page <= 1) base else "${base.trimEnd('/')}/$page/"
+        return if (page <= 1) "${base.trimEnd('/')}/1/" else "${base.trimEnd('/')}/$page/"
+    }
+
+    private fun ensureBase() {
+        mirrors.base(client, headers)
     }
 
     private fun parseList(response: Response): AnimesPage {
