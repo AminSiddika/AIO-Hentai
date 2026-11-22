@@ -11,6 +11,7 @@ import com.aiohentai.cs.sites.p91.P91Provider
 import com.aiohentai.cs.sites.animeidhentai.AnimeIdHentaiProvider
 import com.aiohentai.cs.sites.animesex.AnimeSexProvider
 import com.aiohentai.cs.sites.cartoonporn.CartoonPornProvider
+import com.aiohentai.cs.sites.eporner.EpornerProvider
 import com.aiohentai.cs.sites.erotichentai.EroticHentaiProvider
 import com.aiohentai.cs.sites.hanimehentai.HanimeHentaiProvider
 import com.aiohentai.cs.sites.hanimered.HanimeRedProvider
@@ -62,6 +63,8 @@ import com.aiohentai.cs.sites.nsfwr34.NsfwR34Provider
 import com.aiohentai.cs.sites.ohentai.OhentaiProvider
 import com.aiohentai.cs.sites.okioto.OkiotoProvider
 import com.aiohentai.cs.sites.oppai.OppaiProvider
+import com.aiohentai.cs.sites.pornxp.PornxpProvider
+import com.aiohentai.cs.sites.porntrex.PorntrexProvider
 import com.aiohentai.cs.sites.r34tube.R34TubeProvider
 import com.aiohentai.cs.sites.rule34paheal.Rule34PahealProvider
 import com.aiohentai.cs.sites.rule34s.Rule34sProvider
@@ -79,6 +82,7 @@ import com.aiohentai.cs.sites.xanimeporn.XAnimePornProvider
 import com.aiohentai.cs.sites.xhamster.XhamsterProvider
 import com.aiohentai.cs.sites.xnxx.XnxxProvider
 import com.aiohentai.cs.sites.xvideos.XvideosProvider
+import com.aiohentai.cs.sites.youporn.YoupornProvider
 import com.aiohentai.cs.sites.zhentube.ZhenTubeProvider
 import com.lagradost.cloudstream3.plugins.CloudstreamPlugin
 import com.lagradost.cloudstream3.plugins.Plugin
@@ -165,5 +169,9 @@ class AIOHentaiPlugin : Plugin() {
         registerMainAPI(XhamsterProvider())
         registerMainAPI(SpankbangProvider())
         registerMainAPI(TnaflixProvider())
+        registerMainAPI(PornxpProvider())
+        registerMainAPI(EpornerProvider())
+        registerMainAPI(PorntrexProvider())
+        registerMainAPI(YoupornProvider())
     }
 }
