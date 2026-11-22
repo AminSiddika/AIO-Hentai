@@ -1,8 +1,8 @@
-version = 10
+version = 11
 
 cloudstream {
     language = "en"
-    description = "73 adult anime/hentai and JAV video sources for CloudStream"
+    description = "78 adult anime/hentai and JAV video sources for CloudStream"
     authors = listOf("JalebiBae")
     status = 2
     tvTypes = listOf("Movie", "Anime", "TvSeries", "AsianDrama", "NSFW")

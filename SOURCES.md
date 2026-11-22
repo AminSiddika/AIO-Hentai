@@ -1,14 +1,14 @@
 # Sources
 
-**73 providers** in plugin **v9**. Most are ported from the Aniyomi suite
+**78 providers** in plugin **v11**. Most are ported from the Aniyomi suite
 [`AminSiddika/animetail-extensions`](https://github.com/AminSiddika/animetail-extensions);
-MissAV, SupJav and SexTB were written for this plugin.
+MissAV, SupJav, SexTB, 91Porn, AsianViral, JavTsunami, Manko, AVPorner, XVideos, XNXX, xHamster, SpankBang and TNAFlix were written for this plugin.
 Browse names keep the upstream `@JalebiBae - ` prefix, omitted here for readability.
 Every active source implements a latest section and is overridable in CloudStream settings.
 
 - Package root: `com.aiohentai.cs.sites.<package>`
 - Each entry has `<Source>.kt` (scraper) and `<Source>Provider.kt` (`AniyomiProvider(<Source>())`).
-- "Browse rows" is the number of verified genre/category rows in `compat/Genres.kt` (38 sites, 192 rows; `—` = none).
+- "Browse rows" is the number of verified genre/category rows in `compat/Genres.kt` (43 sites, 252 rows; `—` = none).
 
 | Browse name | Class | Package | Base URL | Browse rows |
 |---|---|---|---|---|
@@ -85,10 +85,15 @@ Every active source implements a latest section and is overridable in CloudStrea
 | Watch Hentai | `WatchHentai` | `watchhentai` | https://watchhentai.net | 8 |
 | XAnimePorn | `XAnimePorn` | `xanimeporn` | https://xanimeporn.com | 1 |
 | ZhenTube | `ZhenTube` | `zhentube` | https://zhentube.com | 1 |
+| SpankBang | `Spankbang` | `spankbang` | https://spankbang.com | 12 |
+| TNAFlix | `Tnaflix` | `tnaflix` | https://www.tnaflix.com | 12 |
+| xHamster | `Xhamster` | `xhamster` | https://xhamster.com | 12 |
+| XNXX | `Xnxx` | `xnxx` | https://www.xnxx.com | 12 |
+| XVideos | `Xvideos` | `xvideos` | https://www.xvideos.com | 12 |
 
 ## Sources with genre rows
 
-These **38** sources expose static home-screen browse rows. Rows that returned zero items were pruned; the counts below were verified with `provider_smoke.sh --genres`.
+These **43** sources expose static home-screen browse rows. Rows that returned zero items were pruned; the counts below were verified with `provider_smoke.sh --genres`.
 
 | Package | Rows |
 |---|---|
@@ -130,6 +135,11 @@ These **38** sources expose static home-screen browse rows. Rows that returned z
 | `watchhentai` | 8 |
 | `xanimeporn` | 1 |
 | `zhentube` | 1 |
+| `spankbang` | 12 |
+| `tnaflix` | 12 |
+| `xhamster` | 12 |
+| `xnxx` | 12 |
+| `xvideos` | 12 |
 
 Distribution: **93** `/genre/`, **35** `/category/`, **24** `/tag/`, **10** `/genres/`, **8** `/en/genres/` (MissAV), **8** `/videos/category/` (AVPorner), **6** `/rule34/`, **5** `/hentai/`, **3** `/jav-*` (SexTB) — **192 total**.
 

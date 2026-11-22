@@ -1,8 +1,8 @@
 # AIO-Hentai (CloudStream)
 
-A CloudStream 4 plugin with 73 adult sources. Most scrapers are ported from the
+A CloudStream 4 plugin with 78 adult sources. Most scrapers are ported from the
 [Animetail Aniyomi extension suite](https://github.com/AminSiddika/animetail-extensions);
-MissAV, SupJav, SexTB, JavGG, 91Porn, AsianViral, JavTsunami, Manko and AVPorner are native additions. One `.cs3`, one install, 73 sources.
+MissAV, SupJav, SexTB, JavGG, 91Porn, AsianViral, JavTsunami, Manko, AVPorner, XVideos, XNXX, xHamster, SpankBang and TNAFlix are native additions. One `.cs3`, one install, 78 sources.
 
 All sources are adult (NSFW) English video sites.
 
@@ -54,7 +54,7 @@ local NanoHTTPD proxies stay exactly as they were debugged in the Aniyomi extens
 ### Differences from the Aniyomi build
 
 - `MediaVideo.referer` was a global per-APK; here each provider sets it before parsing
-  videos, so 73 sources in one plugin do not leak referers into each other.
+  videos, so 78 sources in one plugin do not leak referers into each other.
 - Only WatchHentai starts a localhost NanoHTTPD proxy for range requests; that still works
   because the plugin runs inside the CloudStream process.
 - Chromecast support is disabled per provider, since localhost proxy links cannot be cast.
@@ -132,7 +132,7 @@ What the adapter test proves end to end (WatchHentai, HentaiCity, Hentai0):
 
 ```
 AIO-Hentai/src/main/kotlin/com/aiohentai/cs/
-  AIOHentaiPlugin.kt          plugin entry, registers 73 providers
+  AIOHentaiPlugin.kt          plugin entry, registers 78 providers
   compat/                     Aniyomi-API compatibility layer
   sites/<site>/<Source>.kt    the ported scraper (unchanged site logic)
   sites/<site>/<Source>Provider.kt

@@ -67,13 +67,18 @@ import com.aiohentai.cs.sites.rule34paheal.Rule34PahealProvider
 import com.aiohentai.cs.sites.rule34s.Rule34sProvider
 import com.aiohentai.cs.sites.rule34video.Rule34VideoProvider
 import com.aiohentai.cs.sites.sextb.SextbProvider
+import com.aiohentai.cs.sites.spankbang.SpankbangProvider
 import com.aiohentai.cs.sites.supjav.SupjavProvider
+import com.aiohentai.cs.sites.tnaflix.TnaflixProvider
 import com.aiohentai.cs.sites.thejoidatabase.TheJoiDatabaseProvider
 import com.aiohentai.cs.sites.threehentai.ThreeDHentaiProvider
 import com.aiohentai.cs.sites.uncensoredhentai.UncensoredHentaiProvider
 import com.aiohentai.cs.sites.watchanimehentai.WatchAnimeHentaiProvider
 import com.aiohentai.cs.sites.watchhentai.WatchHentaiProvider
 import com.aiohentai.cs.sites.xanimeporn.XAnimePornProvider
+import com.aiohentai.cs.sites.xhamster.XhamsterProvider
+import com.aiohentai.cs.sites.xnxx.XnxxProvider
+import com.aiohentai.cs.sites.xvideos.XvideosProvider
 import com.aiohentai.cs.sites.zhentube.ZhenTubeProvider
 import com.lagradost.cloudstream3.plugins.CloudstreamPlugin
 import com.lagradost.cloudstream3.plugins.Plugin
@@ -155,5 +160,10 @@ class AIOHentaiPlugin : Plugin() {
         registerMainAPI(JavtsunamiProvider())
         registerMainAPI(MankoProvider())
         registerMainAPI(P91Provider())
+        registerMainAPI(XvideosProvider())
+        registerMainAPI(XnxxProvider())
+        registerMainAPI(XhamsterProvider())
+        registerMainAPI(SpankbangProvider())
+        registerMainAPI(TnaflixProvider())
     }
 }
