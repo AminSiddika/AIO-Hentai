@@ -1,5 +1,6 @@
 package com.aiohentai.cs.sites.p91
 
+import android.webkit.CookieManager
 import com.aiohentai.cs.compat.AnimeFilterList
 import com.aiohentai.cs.compat.AnimeHttpSource
 import com.aiohentai.cs.compat.AnimesPage
@@ -10,6 +11,7 @@ import com.aiohentai.cs.compat.SEpisode
 import com.aiohentai.cs.compat.Video
 import com.aiohentai.cs.compat.appHttpClient
 import com.aiohentai.cs.compat.asJsoup
+import com.aiohentai.cs.compat.defaultHeaders
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -25,6 +27,20 @@ class P91 : AnimeHttpSource() {
 
     override val client: OkHttpClient
         get() = appHttpClient()
+
+    /**
+     * If the user signed in through CloudStream's built-in browser, reuse that WebView
+     * session. 91Porn only allows guests to watch posts older than three days.
+     */
+    override val headers: okhttp3.Headers
+        get() {
+            val builder = defaultHeaders.newBuilder()
+            val cookie = runCatching {
+                CookieManager.getInstance()?.getCookie(baseUrl)
+            }.getOrNull()
+            if (!cookie.isNullOrBlank()) builder.set("Cookie", cookie)
+            return builder.build()
+        }
 
     init {
         MediaVideo.referer = "$baseUrl/"
@@ -124,7 +140,12 @@ class P91 : AnimeHttpSource() {
             .mapNotNullTo(urls) { it.absUrl("src").takeIf { url -> url.startsWith("http") } }
 
         return urls.filter { it.startsWith("http") }
-            .map { MediaVideo.create(it, "MP4", it) }
+            .map {
+                val videoHeaders = headers.newBuilder()
+                    .set("Referer", "$baseUrl/")
+                    .build()
+                MediaVideo.create(it, "MP4", it, videoHeaders)
+            }
     }
 
     companion object {
