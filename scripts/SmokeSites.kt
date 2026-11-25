@@ -46,7 +46,9 @@ import com.aiohentai.cs.sites.hentaivideos.HentaiVideos
 import com.aiohentai.cs.sites.hentaiyes.HentaiYes
 import com.aiohentai.cs.sites.hentaiyoga.HentaiYoga
 import com.aiohentai.cs.sites.hentaverse.Hentaverse
+import com.aiohentai.cs.sites.hsex.Hsex
 import com.aiohentai.cs.sites.hstream.HStream
+import com.aiohentai.cs.sites.javbangers.Javbangers
 import com.aiohentai.cs.sites.javgg.Javgg
 import com.aiohentai.cs.sites.javguru.JavGuru
 import com.aiohentai.cs.sites.javtsunami.Javtsunami
@@ -60,6 +62,7 @@ import com.aiohentai.cs.sites.nekopoi.Nekopoi
 import com.aiohentai.cs.sites.nsfwr34.NsfwR34
 import com.aiohentai.cs.sites.ohentai.Ohentai
 import com.aiohentai.cs.sites.okioto.Okioto
+import com.aiohentai.cs.sites.okxxx.Okxxx
 import com.aiohentai.cs.sites.oppai.Oppai
 import com.aiohentai.cs.sites.p91.P91
 import com.aiohentai.cs.sites.porntrex.Porntrex
@@ -131,7 +134,9 @@ fun smokeSites(): List<Pair<String, () -> AnimeHttpSource>> = listOf(
     "HentaiYes" to { HentaiYes() },
     "HentaiYoga" to { HentaiYoga() },
     "Hentaverse" to { Hentaverse() },
+    "Hsex" to { Hsex() },
     "HStream" to { HStream() },
+    "Javbangers" to { Javbangers() },
     "Javgg" to { Javgg() },
     "JavGuru" to { JavGuru() },
     "Javtsunami" to { Javtsunami() },
@@ -145,6 +150,7 @@ fun smokeSites(): List<Pair<String, () -> AnimeHttpSource>> = listOf(
     "NsfwR34" to { NsfwR34() },
     "Ohentai" to { Ohentai() },
     "Okioto" to { Okioto() },
+    "Okxxx" to { Okxxx() },
     "Oppai" to { Oppai() },
     "P91" to { P91() },
     "Porntrex" to { Porntrex() },

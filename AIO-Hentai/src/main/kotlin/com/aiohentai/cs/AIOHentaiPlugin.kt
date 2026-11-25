@@ -51,6 +51,8 @@ import com.aiohentai.cs.sites.hentaiyes.HentaiYesProvider
 import com.aiohentai.cs.sites.hentaiyoga.HentaiYogaProvider
 import com.aiohentai.cs.sites.hentaverse.HentaverseProvider
 import com.aiohentai.cs.sites.hstream.HStreamProvider
+import com.aiohentai.cs.sites.hsex.HsexProvider
+import com.aiohentai.cs.sites.javbangers.JavbangersProvider
 import com.aiohentai.cs.sites.javgg.JavggProvider
 import com.aiohentai.cs.sites.javguru.JavGuruProvider
 import com.aiohentai.cs.sites.miohentai.MioHentaiProvider
@@ -63,6 +65,7 @@ import com.aiohentai.cs.sites.nsfwr34.NsfwR34Provider
 import com.aiohentai.cs.sites.ohentai.OhentaiProvider
 import com.aiohentai.cs.sites.okioto.OkiotoProvider
 import com.aiohentai.cs.sites.oppai.OppaiProvider
+import com.aiohentai.cs.sites.okxxx.OkxxxProvider
 import com.aiohentai.cs.sites.pornxp.PornxpProvider
 import com.aiohentai.cs.sites.porntrex.PorntrexProvider
 import com.aiohentai.cs.sites.r34tube.R34TubeProvider
@@ -173,5 +176,8 @@ class AIOHentaiPlugin : Plugin() {
         registerMainAPI(EpornerProvider())
         registerMainAPI(PorntrexProvider())
         registerMainAPI(YoupornProvider())
+        registerMainAPI(OkxxxProvider())
+        registerMainAPI(JavbangersProvider())
+        registerMainAPI(HsexProvider())
     }
 }

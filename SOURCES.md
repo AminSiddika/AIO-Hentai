@@ -1,14 +1,14 @@
 # Sources
 
-**82 providers** in plugin **v13**. Most are ported from the Aniyomi suite
+**85 providers** in plugin **v14**. Most are ported from the Aniyomi suite
 [`AminSiddika/animetail-extensions`](https://github.com/AminSiddika/animetail-extensions);
-MissAV, SupJav, SexTB, 91Porn, AsianViral, JavTsunami, Manko, AVPorner, XVideos, XNXX, xHamster, SpankBang, TNAFlix, PornXP, EPorner, PornTrex and YouPorn were written for this plugin.
+MissAV, SupJav, SexTB, 91Porn, AsianViral, JavTsunami, Manko, AVPorner, XVideos, XNXX, xHamster, SpankBang, TNAFlix, PornXP, EPorner, PornTrex, YouPorn, OK.XXX, JavBangers and 好色TV were written for this plugin.
 Browse names keep the upstream `@JalebiBae - ` prefix, omitted here for readability.
 Every active source implements a latest section and is overridable in CloudStream settings.
 
 - Package root: `com.aiohentai.cs.sites.<package>`
 - Each entry has `<Source>.kt` (scraper) and `<Source>Provider.kt` (`AniyomiProvider(<Source>())`).
-- "Browse rows" is the number of verified genre/category rows in `compat/Genres.kt` (47 sites, 424 rows; `—` = none).
+- "Browse rows" is the number of verified genre/category rows in `compat/Genres.kt` (50 sites, 481 rows; `—` = none).
 
 | Browse name | Class | Package | Base URL | Browse rows |
 |---|---|---|---|---|
@@ -85,6 +85,9 @@ Every active source implements a latest section and is overridable in CloudStrea
 | Watch Hentai | `WatchHentai` | `watchhentai` | https://watchhentai.net | 8 |
 | XAnimePorn | `XAnimePorn` | `xanimeporn` | https://xanimeporn.com | 1 |
 | ZhenTube | `ZhenTube` | `zhentube` | https://zhentube.com | 1 |
+| 好色TV | `Hsex` | `hsex` | https://hsex.icu | 5 |
+| JavBangers | `Javbangers` | `javbangers` | https://www.javbangers.com | 26 |
+| OK.XXX | `Okxxx` | `okxxx` | https://ok.xxx | 26 |
 | EPorner | `Eporner` | `eporner` | https://www.eporner.com | 26 |
 | PornXP | `Pornxp` | `pornxp` | https://pxp.pink | 26 |
 | PornTrex | `Porntrex` | `porntrex` | https://www.porntrex.com | 26 |
@@ -97,7 +100,7 @@ Every active source implements a latest section and is overridable in CloudStrea
 
 ## Sources with genre rows
 
-These **47** sources expose static home-screen browse rows. Rows that returned zero items were pruned; the counts below were verified with `provider_smoke.sh --genres`.
+These **50** sources expose static home-screen browse rows. Rows that returned zero items were pruned; the counts below were verified with `provider_smoke.sh --genres`.
 
 | Package | Rows |
 |---|---|
@@ -139,6 +142,9 @@ These **47** sources expose static home-screen browse rows. Rows that returned z
 | `watchhentai` | 8 |
 | `xanimeporn` | 1 |
 | `zhentube` | 1 |
+| `hsex` | 5 |
+| `javbangers` | 26 |
+| `okxxx` | 26 |
 | `eporner` | 26 |
 | `pornxp` | 26 |
 | `porntrex` | 26 |
