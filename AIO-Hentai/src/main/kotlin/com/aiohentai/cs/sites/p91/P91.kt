@@ -30,13 +30,15 @@ class P91 : AnimeHttpSource() {
         MediaVideo.referer = "$baseUrl/"
     }
 
+    // 91Porn only lets guests watch videos older than three days. The "new"/"hot"
+    // feeds are full of login-only posts, so the rows use guest-accessible lists.
     override fun popularAnimeRequest(page: Int): Request =
-        GET(withPage("$baseUrl/v.php?category=hot&viewtype=basic", page), headers)
+        GET(withPage("$baseUrl/v.php?category=top&m=-1&viewtype=basic", page), headers)
 
     override fun popularAnimeParse(response: Response): AnimesPage = parseList(response)
 
     override fun latestUpdatesRequest(page: Int): Request =
-        GET(withPage("$baseUrl/v.php?next=watch", page), headers)
+        GET(withPage("$baseUrl/v.php?category=tf&viewtype=basic", page), headers)
 
     override fun latestUpdatesParse(response: Response): AnimesPage = parseList(response)
 

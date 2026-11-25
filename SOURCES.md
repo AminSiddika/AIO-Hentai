@@ -1,6 +1,6 @@
 # Sources
 
-**85 providers** in plugin **v15**. Most are ported from the Aniyomi suite
+**85 providers** in plugin **v16**. Most are ported from the Aniyomi suite
 [`AminSiddika/animetail-extensions`](https://github.com/AminSiddika/animetail-extensions);
 MissAV, SupJav, SexTB, 91Porn, AsianViral, JavTsunami, Manko, AVPorner, XVideos, XNXX, xHamster, SpankBang, TNAFlix, PornXP, EPorner, PornTrex, YouPorn, OK.XXX, JavBangers and 好色TV were written for this plugin.
 Browse names keep the upstream `@JalebiBae - ` prefix, omitted here for readability.
@@ -8,7 +8,7 @@ Every active source implements a latest section and is overridable in CloudStrea
 
 - Package root: `com.aiohentai.cs.sites.<package>`
 - Each entry has `<Source>.kt` (scraper) and `<Source>Provider.kt` (`AniyomiProvider(<Source>())`).
-- "Browse rows" is the number of verified genre/category rows in `compat/Genres.kt` (50 sites, 481 rows; `—` = none).
+- "Browse rows" is the number of verified genre/category rows in `compat/Genres.kt` (50 sites, 486 rows; `—` = none).
 
 | Browse name | Class | Package | Base URL | Browse rows |
 |---|---|---|---|---|
@@ -77,7 +77,7 @@ Every active source implements a latest section and is overridable in CloudStrea
 | SupJav | `Supjav` | `supjav` | https://supjav.com | 6 |
 | The JOI Database | `TheJoiDatabase` | `thejoidatabase` | https://www.the-joi-database.com | — |
 | 3DHentai | `ThreeDHentai` | `threehentai` | https://3dhentai.it.com | — |
-| 91Porn | `P91` | `p91` | https://www.91porn.com | — |
+| 91Porn | `P91` | `p91` | https://www.91porn.com | 5 |
 | AsianViral | `Asianviral` | `asianviral` | https://asianviral.net | — |
 | AVPorner | `Avporner` | `avporner` | https://avporner.com | — |
 | UncensoredHentai | `UncensoredHentai` | `uncensoredhentai` | https://uncensoredhentai.xxx | 8 |
@@ -142,6 +142,7 @@ These **50** sources expose static home-screen browse rows. Rows that returned z
 | `watchhentai` | 8 |
 | `xanimeporn` | 1 |
 | `zhentube` | 1 |
+| `p91` | 5 |
 | `hsex` | 5 |
 | `javbangers` | 26 |
 | `okxxx` | 26 |
