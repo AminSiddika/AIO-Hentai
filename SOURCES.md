@@ -1,6 +1,6 @@
 # Sources
 
-**85 providers** in plugin **v14**. Most are ported from the Aniyomi suite
+**85 providers** in plugin **v15**. Most are ported from the Aniyomi suite
 [`AminSiddika/animetail-extensions`](https://github.com/AminSiddika/animetail-extensions);
 MissAV, SupJav, SexTB, 91Porn, AsianViral, JavTsunami, Manko, AVPorner, XVideos, XNXX, xHamster, SpankBang, TNAFlix, PornXP, EPorner, PornTrex, YouPorn, OK.XXX, JavBangers and 好色TV were written for this plugin.
 Browse names keep the upstream `@JalebiBae - ` prefix, omitted here for readability.

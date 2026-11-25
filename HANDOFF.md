@@ -1,6 +1,6 @@
 # AIO-Hentai — Engineering Handoff
 
-Published: **v13** (`65339b3`); current working tree: **v14** (not pushed).
+Published: **v14** (`54bd385`); current working tree: **v15** (not pushed).
 Upstream: <https://github.com/AminSiddika/AIO-Hentai>
 
 A CloudStream 4 plugin that ships **85 adult (NSFW) video providers** in one `.cs3`.
@@ -13,7 +13,7 @@ plus one adapter per source.
 > `.cs3`). v8 added 91Porn, AsianViral, JavTsunami, Manko and AVPorner. v9 fixed
 > 91Porn's full listing and AVPorner's Popular + 8 category rows. v10 fixed missing
 > thumbnails across 11 providers. v11 adds XVideos, XNXX, xHamster, SpankBang and
-> TNAFlix with A-Z category rows. v12 adds A-Z rows for those five, regional mirror fallback (xvideos2/3, xnxx2/3/tv/xxx, spankbang.party), a JavGuru poster mirror and working AvPorner category rows. v13 adds PornXP, EPorner, PornTrex and YouPorn. v14 adds OK.XXX, JavBangers and 好色TV (Hsex).
+> TNAFlix with A-Z category rows. v12 adds A-Z rows for those five, regional mirror fallback (xvideos2/3, xnxx2/3/tv/xxx, spankbang.party), a JavGuru poster mirror and working AvPorner category rows. v13 adds PornXP, EPorner, PornTrex and YouPorn. v14 adds OK.XXX, JavBangers and 好色TV (Hsex). v15 fixes 91Porn's article.vitem card markup.
 
 ---
 
@@ -21,7 +21,7 @@ plus one adapter per source.
 
 | Item | Value |
 |---|---|
-| Plugin version | `14` (`AIO-Hentai/build.gradle.kts`) |
+| Plugin version | `15` (`AIO-Hentai/build.gradle.kts`) |
 | Providers registered | 85 |
 | Kotlin files | 180 (85 scrapers + 85 provider wrappers + 9 compat + 1 plugin) |
 | Genre rows | 50 sites, 481 rows |

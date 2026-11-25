@@ -53,7 +53,8 @@ class P91 : AnimeHttpSource() {
 
     private fun parseList(response: Response): AnimesPage {
         val doc = response.asJsoup()
-        val items = doc.select("div.well")
+        // 91Porn changed the card element from div.well to article.vitem/well.
+        val items = doc.select("article.vitem, article.well, div.well, div.vitem")
             .mapNotNull { card ->
                 val link = card.selectFirst("a[href*='view_video.php']") ?: return@mapNotNull null
                 val href = link.absUrl("href").ifBlank { link.attr("href") }
@@ -61,9 +62,13 @@ class P91 : AnimeHttpSource() {
                 val image = card.selectFirst("img.img-responsive")
                 SAnime.create().apply {
                     setUrlWithoutDomain(href)
-                    title = card.selectFirst("span.video-title")?.text()?.trim()
+                    title = card.selectFirst("bdi")?.text()?.trim()
                         ?.takeIf { it.isNotBlank() }
+                        ?: card.selectFirst("span.video-title")?.text()?.trim()
+                            ?.takeIf { it.isNotBlank() }
                         ?: link.attr("title").trim()
+                        ?: image?.attr("alt")?.trim()
+                        ?: link.text().trim()
                     thumbnail_url = image?.absUrl("src")?.takeIf { it.isNotBlank() }
                         ?: image?.absUrl("data-src")
                 }
